@@ -22,7 +22,7 @@ const acceptedTypes = "image/png,image/jpeg";
 const idleLogs = ["[준비됨] 이미지를 선택하고 단어장 생성을 누르면 처리 로그가 여기에 표시됩니다."];
 const providerSettingsStorageKey = "english-memory-note-maker.provider-settings";
 const defaultProviderSettings: ProviderSettings = {
-  ollamaBaseUrl: "https://ollama.com/api/tags",
+  ollamaBaseUrl: "https://ollama.com/api",
   ollamaApiKey: "",
   ollamaModel: "gemma4:31b-cloud",
   ollamaVisionModel: "gemma4:31b-cloud",
