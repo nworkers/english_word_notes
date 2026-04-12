@@ -43,7 +43,7 @@ export function buildWorkbookXml(payload: MemoryNoteExportPayload) {
   const sheets: SpreadsheetSheet[] = payload.sections.map((section) => ({
     name: section.title,
     columns: ["번호", "문항", "답안"],
-    widths: [42, 235, 180],
+    widths: [28, 172, 256],
     rows: section.rows.map((row) => [
       String(row.sourceNumber),
       row.prompt,
@@ -176,8 +176,8 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
       const topY = A4_HEIGHT - 92;
       const headerHeight = 17;
       const rowHeight = 20.4;
-      const numberColumnWidth = 46;
-      const promptWidth = 342;
+      const numberColumnWidth = 30;
+      const promptWidth = 268;
       const answerWidth = A4_WIDTH - PAGE_MARGIN * 2 - promptWidth;
       const promptX = PAGE_MARGIN;
       const answerX = promptX + promptWidth;
@@ -220,14 +220,14 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
       });
 
       await drawTextLine(page, textRenderer, "번호", {
-        x: promptX + 10,
+        x: promptX + 5,
         y: tableTopY - headerHeight + 5.3,
         size: 7.5,
         color: rgb(0, 0, 0)
       });
 
       await drawTextLine(page, textRenderer, "문항", {
-        x: promptX + numberColumnWidth + 8,
+        x: promptX + numberColumnWidth + 5,
         y: tableTopY - headerHeight + 5.3,
         size: 7.5,
         color: rgb(0, 0, 0)
@@ -255,18 +255,18 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
         }
 
         await drawTextLine(page, textRenderer, `${row.sourceNumber}.`, {
-          x: promptX + 10,
+          x: promptX + 4,
           y: textY,
-          size: 7.2,
-          maxWidth: numberColumnWidth - 18,
+          size: 7.7,
+          maxWidth: numberColumnWidth - 6,
           color: rgb(0, 0, 0)
         });
 
         await drawTextLine(page, textRenderer, row.prompt, {
-          x: promptX + numberColumnWidth + 8,
+          x: promptX + numberColumnWidth + 5,
           y: textY,
-          size: 7.2,
-          maxWidth: promptWidth - numberColumnWidth - 14,
+          size: 7.8,
+          maxWidth: promptWidth - numberColumnWidth - 7,
           color: rgb(0, 0, 0)
         });
       }
