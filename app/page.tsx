@@ -30,7 +30,12 @@ const defaultProviderSettings: ProviderSettings = {
   geminiModel: "gemini-2.5-flash",
   geminiVisionModel: "gemini-2.5-flash",
   geminiBaseUrl: "https://generativelanguage.googleapis.com/v1beta",
-  geminiTimeoutMs: 120000
+  geminiTimeoutMs: 120000,
+  openaiApiKey: "",
+  openaiModel: "gpt-4.1-mini",
+  openaiVisionModel: "gpt-4.1-mini",
+  openaiBaseUrl: "https://api.openai.com/v1",
+  openaiTimeoutMs: 120000
 };
 
 type ExtractionJobSnapshot = {
@@ -52,7 +57,13 @@ export default function HomePage() {
   const [result, setResult] = useState<ExtractionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<
-    "ocr" | "ocr+ollama" | "ollama-vision" | "ocr+gemini" | "gemini-vision"
+    | "ocr"
+    | "ocr+ollama"
+    | "ollama-vision"
+    | "ocr+gemini"
+    | "gemini-vision"
+    | "ocr+openai"
+    | "openai-vision"
   >("ollama-vision");
   const [isPending, startTransition] = useTransition();
   const [wordRows, setWordRows] = useState<MemoryNoteRow[]>([]);
@@ -529,12 +540,32 @@ export default function HomePage() {
                 />
                 Gemini Vision only
               </label>
+              <label>
+                <input
+                  type="radio"
+                  name="mode"
+                  value="ocr+openai"
+                  checked={mode === "ocr+openai"}
+                  onChange={() => setMode("ocr+openai")}
+                />
+                OCR + OpenAI
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="mode"
+                  value="openai-vision"
+                  checked={mode === "openai-vision"}
+                  onChange={() => setMode("openai-vision")}
+                />
+                OpenAI Vision only
+              </label>
             </div>
           </div>
           <div className="settings-trigger-row">
             <div className="settings-summary">
               <p className="section-label">모델 설정</p>
-              <p>Ollama / Gemini 설정은 팝업에서 관리되며 현재 브라우저에 저장됩니다.</p>
+              <p>Ollama / Gemini / OpenAI 설정은 팝업에서 관리되며 현재 브라우저에 저장됩니다.</p>
             </div>
             <button
               className="secondary-button"
@@ -649,7 +680,7 @@ export default function HomePage() {
             <div className="settings-modal-header">
               <div>
                 <p className="section-label">모델 설정</p>
-                <h2 id="provider-settings-title">Ollama / Gemini 설정</h2>
+                <h2 id="provider-settings-title">Ollama / Gemini / OpenAI 설정</h2>
               </div>
               <button
                 className="settings-modal-close"
@@ -796,6 +827,79 @@ export default function HomePage() {
                   <p className="settings-note">
                     설정값은 현재 브라우저의 로컬 저장소에 저장됩니다.
                   </p>
+                </section>
+
+                <section className="settings-card">
+                  <h3>OpenAI</h3>
+                  <label className="settings-field">
+                    <span>API Key</span>
+                    <input
+                      type="password"
+                      value={providerSettings.openaiApiKey}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          openaiApiKey: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>Base URL</span>
+                    <input
+                      type="text"
+                      value={providerSettings.openaiBaseUrl}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          openaiBaseUrl: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>텍스트 모델</span>
+                    <input
+                      type="text"
+                      value={providerSettings.openaiModel}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          openaiModel: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>Vision 모델</span>
+                    <input
+                      type="text"
+                      value={providerSettings.openaiVisionModel}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          openaiVisionModel: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>Timeout(ms)</span>
+                    <input
+                      type="number"
+                      min={1000}
+                      value={providerSettings.openaiTimeoutMs}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          openaiTimeoutMs: clampPositiveNumber(
+                            Number(event.target.value),
+                            defaultProviderSettings.openaiTimeoutMs
+                          )
+                        }))
+                      }
+                    />
+                  </label>
                 </section>
               </div>
             </div>

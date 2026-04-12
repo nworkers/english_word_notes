@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { extractWithGeminiVision, isGeminiEnabled, postProcessWithGemini } from "@/lib/gemini";
+import { extractWithOpenAIVision, isOpenAIEnabled, postProcessWithOpenAI } from "@/lib/openai";
 import { extractVocabularyFromFiles } from "@/lib/ocr";
 import {
   appendExtractionJobLog,
@@ -52,7 +53,9 @@ export async function POST(request: Request) {
       mode === "ollama-vision" ||
       mode === "ocr+ollama" ||
       mode === "gemini-vision" ||
-      mode === "ocr+gemini"
+      mode === "ocr+gemini" ||
+      mode === "openai-vision" ||
+      mode === "ocr+openai"
         ? 4
         : 3;
     const job = createExtractionJob({ totalFiles: files.length, totalSteps });
@@ -174,6 +177,51 @@ async function runExtractionJob(
       return;
     }
 
+    if (mode === "openai-vision") {
+      if (!isOpenAIEnabled(providerSettings)) {
+        throw new Error("OpenAI API Key가 비어 있습니다. 웹 설정에서 OpenAI 설정을 확인해주세요.");
+      }
+
+      updateExtractionJob(jobId, { progress: 8, stage: "OpenAI Vision 준비" });
+      appendExtractionJobLog(jobId, "OpenAI Vision 추출을 시작합니다.");
+      const llm = await extractWithOpenAIVision(files, providerSettings, {
+        onProgress(progress, stage, message, details) {
+          updateExtractionJob(jobId, {
+            progress,
+            stage,
+            processedFiles: details?.processedFiles,
+            currentStep: details?.currentStep
+          });
+          if (message) {
+            appendExtractionJobLog(jobId, message);
+          }
+        }
+      });
+
+      const result = {
+        modeLabel: "OpenAI Vision",
+        files: files.map((file) => ({
+          name: file.name,
+          size: file.size,
+          type: file.type || "unknown"
+        })),
+        vocabulary: llm.vocabulary,
+        warnings: llm.warnings,
+        rawTexts: []
+      };
+
+      updateExtractionJob(jobId, {
+        status: "completed",
+        progress: 100,
+        stage: "완료",
+        currentStep: 4,
+        processedFiles: files.length,
+        result
+      });
+      appendExtractionJobLog(jobId, "OpenAI Vision 추출이 완료되었습니다.");
+      return;
+    }
+
     const result = await extractVocabularyFromFiles(files, {
       onProgress(progress, stage, message, details) {
         updateExtractionJob(jobId, {
@@ -284,6 +332,63 @@ async function runExtractionJob(
           geminiError instanceof Error
             ? `Gemini 후처리를 건너뛰었습니다: ${geminiError.message}`
             : "Gemini 후처리를 건너뛰었습니다.";
+
+        const fallbackResult = {
+          ...result,
+          warnings: [...result.warnings, warning]
+        };
+        appendExtractionJobLog(jobId, warning);
+        updateExtractionJob(jobId, {
+          status: "completed",
+          progress: 100,
+          stage: "완료",
+          currentStep: 4,
+          processedFiles: files.length,
+          result: fallbackResult
+        });
+        return;
+      }
+    }
+
+    if (mode === "ocr+openai" && isOpenAIEnabled(providerSettings)) {
+      try {
+        appendExtractionJobLog(jobId, "OpenAI 후처리를 시작합니다.");
+        const llmResult = await postProcessWithOpenAI(result, providerSettings, {
+          onProgress(progress, stage, message, details) {
+            updateExtractionJob(jobId, {
+              progress,
+              stage,
+              processedFiles: details?.processedFiles,
+              currentStep: details?.currentStep
+            });
+            if (message) {
+              appendExtractionJobLog(jobId, message);
+            }
+          }
+        });
+
+        const mergedResult = {
+          ...result,
+          modeLabel: `${result.modeLabel} + OpenAI`,
+          vocabulary: llmResult.vocabulary,
+          warnings: [...result.warnings, ...llmResult.warnings]
+        };
+
+        updateExtractionJob(jobId, {
+          status: "completed",
+          progress: 100,
+          stage: "완료",
+          currentStep: 4,
+          processedFiles: files.length,
+          result: mergedResult
+        });
+        appendExtractionJobLog(jobId, "OCR + OpenAI 후처리가 완료되었습니다.");
+        return;
+      } catch (openaiError) {
+        const warning =
+          openaiError instanceof Error
+            ? `OpenAI 후처리를 건너뛰었습니다: ${openaiError.message}`
+            : "OpenAI 후처리를 건너뛰었습니다.";
 
         const fallbackResult = {
           ...result,

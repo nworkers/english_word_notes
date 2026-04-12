@@ -59,4 +59,9 @@ export type ProviderSettings = {
   geminiVisionModel: string;
   geminiBaseUrl: string;
   geminiTimeoutMs: number;
+  openaiApiKey: string;
+  openaiModel: string;
+  openaiVisionModel: string;
+  openaiBaseUrl: string;
+  openaiTimeoutMs: number;
 };
