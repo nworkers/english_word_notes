@@ -44,7 +44,7 @@ export async function postProcessWithOllama(
   const allowedWords = new Set(
     extraction.vocabulary.map((entry) => entry.word.trim().toLowerCase()).filter(Boolean)
   );
-  const ocrText = extraction.rawTexts.map((item) => item.text).join("\n");
+  const ocrText = (extraction.rawTexts ?? []).map((item) => item.text).join("\n");
   const resolved = resolveOllamaSettings(settings);
   const baseUrl = resolved.baseUrl;
   const model = resolved.model;
@@ -206,7 +206,7 @@ async function postProcessWithGenerate(
   const allowedWords = new Set(
     extraction.vocabulary.map((entry) => entry.word.trim().toLowerCase()).filter(Boolean)
   );
-  const ocrText = extraction.rawTexts.map((item) => item.text).join("\n");
+  const ocrText = (extraction.rawTexts ?? []).map((item) => item.text).join("\n");
   const generateUrl = buildOllamaUrl(baseUrl, "/generate");
   const prompt = buildGeneratePrompt(extraction);
   const resolved = resolveOllamaSettings(settings);
@@ -278,7 +278,7 @@ function buildMessages(extraction: ExtractionResponse) {
       ocr_mode_label: extraction.modeLabel,
       whitelist_words: extraction.vocabulary.map((entry) => entry.word).sort(),
       preliminary_vocabulary: extraction.vocabulary,
-      raw_texts: extraction.rawTexts
+      raw_texts: extraction.rawTexts ?? []
     },
     null,
     2

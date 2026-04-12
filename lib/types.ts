@@ -21,7 +21,7 @@ export type ExtractionResponse = {
   files: UploadedFileSummary[];
   vocabulary: VocabularyEntry[];
   warnings: string[];
-  rawTexts: Array<{
+  rawTexts?: Array<{
     fileName: string;
     text: string;
   }>;

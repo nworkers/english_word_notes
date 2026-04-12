@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { extractWithGeminiVision, isGeminiEnabled, postProcessWithGemini } from "@/lib/gemini";
-import { extractWithOpenAIVision, isOpenAIEnabled, postProcessWithOpenAI } from "@/lib/openai";
-import { extractVocabularyFromFiles } from "@/lib/ocr";
+import { extractWithGeminiVision, isGeminiEnabled } from "@/lib/gemini";
+import { extractWithOpenAIVision, isOpenAIEnabled } from "@/lib/openai";
 import {
   appendExtractionJobLog,
   createExtractionJob,
@@ -10,8 +9,7 @@ import {
 } from "@/lib/extraction-jobs";
 import {
   extractWithOllamaVision,
-  isOllamaEnabled,
-  postProcessWithOllama
+  isOllamaEnabled
 } from "@/lib/ollama";
 import type { ProviderSettings } from "@/lib/types";
 
@@ -37,7 +35,7 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const incomingFiles = formData.getAll("files");
-    const mode = String(formData.get("mode") ?? "ocr");
+    const mode = String(formData.get("mode") ?? "ollama-vision");
     const providerSettings = parseProviderSettings(formData.get("providerSettings"));
 
     const files = incomingFiles.filter((value): value is File => value instanceof File);
@@ -49,15 +47,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const totalSteps =
-      mode === "ollama-vision" ||
-      mode === "ocr+ollama" ||
-      mode === "gemini-vision" ||
-      mode === "ocr+gemini" ||
-      mode === "openai-vision" ||
-      mode === "ocr+openai"
-        ? 4
-        : 3;
+    if (!["ollama-vision", "gemini-vision", "openai-vision"].includes(mode)) {
+      return NextResponse.json({ message: "지원하지 않는 추출 모드입니다." }, { status: 400 });
+    }
+
+    const totalSteps = 4;
     const job = createExtractionJob({ totalFiles: files.length, totalSteps });
     updateExtractionJob(job.id, {
       status: "running",
@@ -123,7 +117,6 @@ async function runExtractionJob(
         })),
         vocabulary: llm.vocabulary,
         warnings: llm.warnings,
-        rawTexts: []
       };
 
       updateExtractionJob(jobId, {
@@ -168,7 +161,6 @@ async function runExtractionJob(
         })),
         vocabulary: llm.vocabulary,
         warnings: llm.warnings,
-        rawTexts: []
       };
 
       updateExtractionJob(jobId, {
@@ -213,7 +205,6 @@ async function runExtractionJob(
         })),
         vocabulary: llm.vocabulary,
         warnings: llm.warnings,
-        rawTexts: []
       };
 
       updateExtractionJob(jobId, {
@@ -228,203 +219,9 @@ async function runExtractionJob(
       return;
     }
 
-    const result = await extractVocabularyFromFiles(files, {
-      onProgress(progress, stage, message, details) {
-        updateExtractionJob(jobId, {
-          progress,
-          stage,
-          processedFiles: details?.processedFiles,
-          currentStep: details?.currentStep
-        });
-        if (message) {
-          appendExtractionJobLog(jobId, message);
-        }
-      }
-    });
-
-    if (mode === "ocr+ollama" && isOllamaEnabled(providerSettings)) {
-      try {
-        appendExtractionJobLog(jobId, "Ollama 후처리를 시작합니다.");
-        const llmResult = await postProcessWithOllama(result, providerSettings, {
-          onProgress(progress, stage, message, details) {
-            updateExtractionJob(jobId, {
-              progress,
-              stage,
-              processedFiles: details?.processedFiles,
-              currentStep: details?.currentStep
-            });
-            if (message) {
-              appendExtractionJobLog(jobId, message);
-            }
-          }
-        });
-
-        const mergedResult = {
-          ...result,
-          modeLabel: `${result.modeLabel} + Ollama`,
-          vocabulary: llmResult.vocabulary,
-          warnings: [...result.warnings, ...llmResult.warnings]
-        };
-
-        updateExtractionJob(jobId, {
-          status: "completed",
-          progress: 100,
-          stage: "완료",
-          currentStep: 4,
-          processedFiles: files.length,
-          result: mergedResult
-        });
-        appendExtractionJobLog(jobId, "OCR + Ollama 후처리가 완료되었습니다.");
-        return;
-      } catch (ollamaError) {
-        const warning =
-          ollamaError instanceof Error
-            ? `Ollama 후처리를 건너뛰었습니다: ${ollamaError.message}`
-            : "Ollama 후처리를 건너뛰었습니다.";
-
-        const fallbackResult = {
-          ...result,
-          warnings: [...result.warnings, warning]
-        };
-        appendExtractionJobLog(jobId, warning);
-        updateExtractionJob(jobId, {
-          status: "completed",
-          progress: 100,
-          stage: "완료",
-          currentStep: 4,
-          processedFiles: files.length,
-          result: fallbackResult
-        });
-        return;
-      }
-    }
-
-    if (mode === "ocr+gemini" && isGeminiEnabled(providerSettings)) {
-      try {
-        appendExtractionJobLog(jobId, "Gemini 후처리를 시작합니다.");
-        const llmResult = await postProcessWithGemini(result, providerSettings, {
-          onProgress(progress, stage, message, details) {
-            updateExtractionJob(jobId, {
-              progress,
-              stage,
-              processedFiles: details?.processedFiles,
-              currentStep: details?.currentStep
-            });
-            if (message) {
-              appendExtractionJobLog(jobId, message);
-            }
-          }
-        });
-
-        const mergedResult = {
-          ...result,
-          modeLabel: `${result.modeLabel} + Gemini`,
-          vocabulary: llmResult.vocabulary,
-          warnings: [...result.warnings, ...llmResult.warnings]
-        };
-
-        updateExtractionJob(jobId, {
-          status: "completed",
-          progress: 100,
-          stage: "완료",
-          currentStep: 4,
-          processedFiles: files.length,
-          result: mergedResult
-        });
-        appendExtractionJobLog(jobId, "OCR + Gemini 후처리가 완료되었습니다.");
-        return;
-      } catch (geminiError) {
-        const warning =
-          geminiError instanceof Error
-            ? `Gemini 후처리를 건너뛰었습니다: ${geminiError.message}`
-            : "Gemini 후처리를 건너뛰었습니다.";
-
-        const fallbackResult = {
-          ...result,
-          warnings: [...result.warnings, warning]
-        };
-        appendExtractionJobLog(jobId, warning);
-        updateExtractionJob(jobId, {
-          status: "completed",
-          progress: 100,
-          stage: "완료",
-          currentStep: 4,
-          processedFiles: files.length,
-          result: fallbackResult
-        });
-        return;
-      }
-    }
-
-    if (mode === "ocr+openai" && isOpenAIEnabled(providerSettings)) {
-      try {
-        appendExtractionJobLog(jobId, "OpenAI 후처리를 시작합니다.");
-        const llmResult = await postProcessWithOpenAI(result, providerSettings, {
-          onProgress(progress, stage, message, details) {
-            updateExtractionJob(jobId, {
-              progress,
-              stage,
-              processedFiles: details?.processedFiles,
-              currentStep: details?.currentStep
-            });
-            if (message) {
-              appendExtractionJobLog(jobId, message);
-            }
-          }
-        });
-
-        const mergedResult = {
-          ...result,
-          modeLabel: `${result.modeLabel} + OpenAI`,
-          vocabulary: llmResult.vocabulary,
-          warnings: [...result.warnings, ...llmResult.warnings]
-        };
-
-        updateExtractionJob(jobId, {
-          status: "completed",
-          progress: 100,
-          stage: "완료",
-          currentStep: 4,
-          processedFiles: files.length,
-          result: mergedResult
-        });
-        appendExtractionJobLog(jobId, "OCR + OpenAI 후처리가 완료되었습니다.");
-        return;
-      } catch (openaiError) {
-        const warning =
-          openaiError instanceof Error
-            ? `OpenAI 후처리를 건너뛰었습니다: ${openaiError.message}`
-            : "OpenAI 후처리를 건너뛰었습니다.";
-
-        const fallbackResult = {
-          ...result,
-          warnings: [...result.warnings, warning]
-        };
-        appendExtractionJobLog(jobId, warning);
-        updateExtractionJob(jobId, {
-          status: "completed",
-          progress: 100,
-          stage: "완료",
-          currentStep: 4,
-          processedFiles: files.length,
-          result: fallbackResult
-        });
-        return;
-      }
-    }
-
-    updateExtractionJob(jobId, {
-      status: "completed",
-      progress: 100,
-      stage: "완료",
-      currentStep: 3,
-      processedFiles: files.length,
-      result
-    });
-    appendExtractionJobLog(jobId, "OCR 추출이 완료되었습니다.");
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "OCR 처리 중 알 수 없는 오류가 발생했습니다.";
+      error instanceof Error ? error.message : "추출 처리 중 알 수 없는 오류가 발생했습니다.";
     updateExtractionJob(jobId, {
       status: "failed",
       progress: 100,

@@ -68,19 +68,9 @@ export function buildExportPayload(args: {
 }
 
 export function deriveNotebookTitle(args: {
-  rawTexts?: Array<{ fileName: string; text: string }>;
   files: UploadedFileSummary[];
   vocabulary: VocabularyEntry[];
 }) {
-  const candidateFromText = args.rawTexts
-    ?.flatMap((entry) => entry.text.split(/\r?\n/))
-    .map((line) => normalizeTitleCandidate(line))
-    .find((line) => isNotebookTitleCandidate(line));
-
-  if (candidateFromText) {
-    return candidateFromText;
-  }
-
   if (args.vocabulary.length > 0) {
     const firstWord = args.vocabulary[0]?.word?.trim();
     if (firstWord) {

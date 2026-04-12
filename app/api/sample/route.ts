@@ -35,8 +35,7 @@ export async function GET(request: Request) {
       modeLabel: `Sample (${parsed.case})`,
       files,
       vocabulary,
-      warnings: [`샘플 데이터: ${parsed.case} (${parsed.status}, ${parsed.source})`],
-      rawTexts: []
+      warnings: [`샘플 데이터: ${parsed.case} (${parsed.status}, ${parsed.source})`]
     };
 
     return Response.json(response);

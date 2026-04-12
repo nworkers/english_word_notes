@@ -47,7 +47,7 @@ export async function postProcessWithGemini(
   const allowedWords = new Set(
     extraction.vocabulary.map((entry) => entry.word.trim().toLowerCase()).filter(Boolean)
   );
-  const ocrText = extraction.rawTexts.map((item) => item.text).join("\n");
+  const ocrText = (extraction.rawTexts ?? []).map((item) => item.text).join("\n");
   const resolved = resolveGeminiSettings(settings);
   const url = buildGeminiUrl(resolved.baseUrl, resolved.model, resolved.apiKey);
 
@@ -277,7 +277,7 @@ function buildGeminiTextPrompt(extraction: ExtractionResponse) {
       },
       whitelist_words: extraction.vocabulary.map((entry) => entry.word).sort(),
       preliminary_vocabulary: extraction.vocabulary,
-      raw_texts: extraction.rawTexts
+      raw_texts: extraction.rawTexts ?? []
     },
     null,
     2

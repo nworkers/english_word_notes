@@ -10,10 +10,10 @@ import {
 } from "@/lib/memory-note";
 import type {
   ExtractionResponse,
-  MemoryNoteExportPayload,
-  MemoryNoteRow,
-  ProviderSettings,
-  UploadedFileSummary
+      MemoryNoteExportPayload,
+      MemoryNoteRow,
+      ProviderSettings,
+      UploadedFileSummary
 } from "@/lib/types";
 
 const acceptedTypes = "image/png,image/jpeg";
@@ -58,12 +58,8 @@ export default function HomePage() {
   const [result, setResult] = useState<ExtractionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<
-    | "ocr"
-    | "ocr+ollama"
     | "ollama-vision"
-    | "ocr+gemini"
     | "gemini-vision"
-    | "ocr+openai"
     | "openai-vision"
   >("ollama-vision");
   const [isPending, startTransition] = useTransition();
@@ -279,9 +275,8 @@ export default function HomePage() {
     setWordRounds(3);
     setMeaningRounds(3);
     setCustomNotebookTitle(
-      result.notebookTitle ||
+        result.notebookTitle ||
         deriveNotebookTitle({
-          rawTexts: result.rawTexts,
           files: result.files,
           vocabulary: result.vocabulary
         })
@@ -303,7 +298,6 @@ export default function HomePage() {
         customNotebookTitle.trim() ||
         result.notebookTitle ||
         deriveNotebookTitle({
-          rawTexts: result.rawTexts,
           files: result.files,
           vocabulary: result.vocabulary
         }),
@@ -458,7 +452,7 @@ export default function HomePage() {
             <p className="section-label">1. 업로드</p>
             <h2>단어 이미지 선택</h2>
           </div>
-          <p className="panel-note">이미지를 업로드하면 서버에서 OCR로 텍스트를 읽고 단어-뜻 쌍을 추출합니다.</p>
+          <p className="panel-note">이미지를 업로드하면 Vision 모델이 단어와 뜻 목록을 직접 추출합니다.</p>
         </div>
 
         <form className="upload-form" onSubmit={handleSubmit}>
@@ -497,36 +491,6 @@ export default function HomePage() {
                 <input
                   type="radio"
                   name="mode"
-                  value="ocr"
-                  checked={mode === "ocr"}
-                  onChange={() => setMode("ocr")}
-                />
-                OCR only
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="mode"
-                  value="ocr+ollama"
-                  checked={mode === "ocr+ollama"}
-                  onChange={() => setMode("ocr+ollama")}
-                />
-                OCR + Ollama
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="mode"
-                  value="ocr+gemini"
-                  checked={mode === "ocr+gemini"}
-                  onChange={() => setMode("ocr+gemini")}
-                />
-                OCR + Gemini
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="mode"
                   value="ollama-vision"
                   checked={mode === "ollama-vision"}
                   onChange={() => setMode("ollama-vision")}
@@ -542,16 +506,6 @@ export default function HomePage() {
                   onChange={() => setMode("gemini-vision")}
                 />
                 Gemini Vision only
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="mode"
-                  value="ocr+openai"
-                  checked={mode === "ocr+openai"}
-                  onChange={() => setMode("ocr+openai")}
-                />
-                OCR + OpenAI
               </label>
               <label>
                 <input
@@ -999,7 +953,6 @@ export default function HomePage() {
             ))}
             <AnswerKeySection result={result} />
             <StructuredJsonSection result={result} />
-            <RawTextSection result={result} />
           </>
         ) : (
           <div className="empty-state">
@@ -1093,26 +1046,6 @@ function AnswerKeySection({ result }: { result: ExtractionResponse }) {
             <div>{entry.word}</div>
             <div>{entry.senses.map((sense) => `${sense.partOfSpeech}: ${sense.meaning}`).join(" / ")}</div>
           </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function RawTextSection({ result }: { result: ExtractionResponse }) {
-  return (
-    <section className="raw-text-card non-print">
-      <div className="note-header">
-        <h3>OCR 원문 미리보기</h3>
-        <p>단어 분리가 이상할 때는 아래 원문을 보고 파싱 규칙을 조정할 수 있습니다.</p>
-      </div>
-
-      <div className="raw-text-list">
-        {result.rawTexts.map((item) => (
-          <article className="raw-text-item" key={item.fileName}>
-            <strong>{item.fileName}</strong>
-            <pre>{item.text || "텍스트를 인식하지 못했습니다."}</pre>
-          </article>
         ))}
       </div>
     </section>
