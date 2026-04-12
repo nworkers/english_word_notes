@@ -1,4 +1,4 @@
-import type { ExtractionResponse, VocabularyEntry, VocabularySense } from "./types";
+import type { ExtractionResponse, ProviderSettings, VocabularyEntry, VocabularySense } from "./types";
 
 type OllamaChatResponse = {
   message?: {
@@ -27,12 +27,14 @@ const DEFAULT_OLLAMA_TIMEOUT_MS = 120_000;
 const DEFAULT_OLLAMA_VISION_MAX_WIDTH = 1024;
 const DEFAULT_OLLAMA_VISION_QUALITY = 4;
 
-export function isOllamaEnabled() {
-  return process.env.OLLAMA_ENABLED === "true";
+export function isOllamaEnabled(settings?: Partial<ProviderSettings>) {
+  const resolved = resolveOllamaSettings(settings);
+  return Boolean(resolved.baseUrl);
 }
 
 export async function postProcessWithOllama(
   extraction: ExtractionResponse,
+  settings?: Partial<ProviderSettings>,
   callbacks?: OllamaProgressCallbacks
 ): Promise<OllamaPostProcessResult> {
   callbacks?.onProgress?.(90, "Ollama 후처리", "OCR 결과를 Ollama로 보정하고 있습니다.", {
@@ -42,8 +44,9 @@ export async function postProcessWithOllama(
     extraction.vocabulary.map((entry) => entry.word.trim().toLowerCase()).filter(Boolean)
   );
   const ocrText = extraction.rawTexts.map((item) => item.text).join("\n");
-  const baseUrl = process.env.OLLAMA_BASE_URL ?? DEFAULT_OLLAMA_BASE_URL;
-  const model = process.env.OLLAMA_MODEL ?? DEFAULT_OLLAMA_MODEL;
+  const resolved = resolveOllamaSettings(settings);
+  const baseUrl = resolved.baseUrl;
+  const model = resolved.model;
   const chatUrl = buildOllamaUrl(baseUrl, "/chat");
   const response = await fetchWithTimeout(chatUrl, {
     method: "POST",
@@ -56,10 +59,10 @@ export async function postProcessWithOllama(
       format: "json",
       messages: buildMessages(extraction)
     })
-  });
+  }, settings);
 
   if (response.status === 404) {
-    return postProcessWithGenerate(extraction, baseUrl, model);
+    return postProcessWithGenerate(extraction, baseUrl, model, settings);
   }
 
   if (!response.ok) {
@@ -86,19 +89,18 @@ export async function postProcessWithOllama(
 
 export async function extractWithOllamaVision(
   files: File[],
+  settings?: Partial<ProviderSettings>,
   callbacks?: OllamaProgressCallbacks
 ) {
   callbacks?.onProgress?.(10, "비전 준비", "Vision 입력 이미지를 준비하고 있습니다.", {
     currentStep: 1,
     processedFiles: 0
   });
-  const baseUrl = process.env.OLLAMA_BASE_URL ?? DEFAULT_OLLAMA_BASE_URL;
-  const model =
-    process.env.OLLAMA_VISION_MODEL ??
-    process.env.OLLAMA_MODEL ??
-    DEFAULT_OLLAMA_VISION_MODEL;
+  const resolved = resolveOllamaSettings(settings);
+  const baseUrl = resolved.baseUrl;
+  const model = resolved.visionModel;
   const chatUrl = buildOllamaUrl(baseUrl, "/chat");
-  const prepared = await prepareVisionFiles(files);
+  const prepared = await prepareVisionFiles(files, settings);
   callbacks?.onProgress?.(35, "비전 준비", "Vision 입력 이미지를 인코딩하고 있습니다.", {
     currentStep: 2,
     processedFiles: prepared.files.length
@@ -134,7 +136,7 @@ export async function extractWithOllamaVision(
         }
       ]
     })
-  });
+  }, settings);
 
   if (!response.ok) {
     throw new Error(`Ollama Vision API 호출 실패: ${response.status} ${response.statusText}`);
@@ -176,7 +178,8 @@ export async function extractWithOllamaVision(
 async function postProcessWithGenerate(
   extraction: ExtractionResponse,
   baseUrl: string,
-  model: string
+  model: string,
+  settings?: Partial<ProviderSettings>
 ): Promise<OllamaPostProcessResult> {
   const allowedWords = new Set(
     extraction.vocabulary.map((entry) => entry.word.trim().toLowerCase()).filter(Boolean)
@@ -195,7 +198,7 @@ async function postProcessWithGenerate(
       format: "json",
       prompt
     })
-  });
+  }, settings);
 
   if (!response.ok) {
     throw new Error(`Ollama API 호출 실패: ${response.status} ${response.statusText}`);
@@ -538,37 +541,27 @@ function buildOllamaUrl(baseUrl: string, path: string) {
   return `${trimmed}/api${path}`;
 }
 
-function getOllamaVisionMaxWidth() {
-  const raw = process.env.OLLAMA_VISION_MAX_WIDTH;
-  if (!raw) {
+function getOllamaVisionMaxWidth(settings?: Partial<ProviderSettings>) {
+  const candidate = settings?.ollamaVisionMaxWidth ?? Number(process.env.OLLAMA_VISION_MAX_WIDTH);
+  if (!Number.isFinite(candidate) || candidate <= 0) {
     return DEFAULT_OLLAMA_VISION_MAX_WIDTH;
   }
 
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return DEFAULT_OLLAMA_VISION_MAX_WIDTH;
-  }
-
-  return parsed;
+  return candidate;
 }
 
-function getOllamaVisionQuality() {
-  const raw = process.env.OLLAMA_VISION_QUALITY;
-  if (!raw) {
+function getOllamaVisionQuality(settings?: Partial<ProviderSettings>) {
+  const candidate = settings?.ollamaVisionQuality ?? Number(process.env.OLLAMA_VISION_QUALITY);
+  if (!Number.isFinite(candidate) || candidate <= 0) {
     return DEFAULT_OLLAMA_VISION_QUALITY;
   }
 
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return DEFAULT_OLLAMA_VISION_QUALITY;
-  }
-
-  return parsed;
+  return candidate;
 }
 
-async function prepareVisionFiles(files: File[]) {
-  const maxWidth = getOllamaVisionMaxWidth();
-  const quality = getOllamaVisionQuality();
+async function prepareVisionFiles(files: File[], settings?: Partial<ProviderSettings>) {
+  const maxWidth = getOllamaVisionMaxWidth(settings);
+  const quality = getOllamaVisionQuality(settings);
   const warnings: string[] = [];
   const preparedFiles: File[] = [];
 
@@ -647,23 +640,22 @@ async function resizeVisionFile(file: File, maxWidth: number, quality: number) {
   }
 }
 
-function getOllamaTimeoutMs() {
-  const raw = process.env.OLLAMA_TIMEOUT_MS;
-  if (!raw) {
+function getOllamaTimeoutMs(settings?: Partial<ProviderSettings>) {
+  const candidate = settings?.ollamaTimeoutMs ?? Number(process.env.OLLAMA_TIMEOUT_MS);
+  if (!Number.isFinite(candidate) || candidate <= 0) {
     return DEFAULT_OLLAMA_TIMEOUT_MS;
   }
 
-  const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return DEFAULT_OLLAMA_TIMEOUT_MS;
-  }
-
-  return parsed;
+  return candidate;
 }
 
-async function fetchWithTimeout(input: string, init: RequestInit) {
+async function fetchWithTimeout(
+  input: string,
+  init: RequestInit,
+  settings?: Partial<ProviderSettings>
+) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), getOllamaTimeoutMs());
+  const timeout = setTimeout(() => controller.abort(), getOllamaTimeoutMs(settings));
 
   try {
     return await fetch(input, {
@@ -727,6 +719,19 @@ export async function debugOllamaVision(imagePath: string) {
     statusText: response.statusText,
     body: text,
     warnings: prepared.warnings
+  };
+}
+
+function resolveOllamaSettings(settings?: Partial<ProviderSettings>) {
+  return {
+    baseUrl:
+      settings?.ollamaBaseUrl?.trim() || process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL,
+    model: settings?.ollamaModel?.trim() || process.env.OLLAMA_MODEL || DEFAULT_OLLAMA_MODEL,
+    visionModel:
+      settings?.ollamaVisionModel?.trim() ||
+      process.env.OLLAMA_VISION_MODEL ||
+      process.env.OLLAMA_MODEL ||
+      DEFAULT_OLLAMA_VISION_MODEL
   };
 }
 

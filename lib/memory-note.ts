@@ -2,6 +2,7 @@ import type {
   MemoryNoteExportPayload,
   MemoryNoteRow,
   MemoryNoteSectionData,
+  UploadedFileSummary,
   VocabularyEntry
 } from "@/lib/types";
 
@@ -36,6 +37,7 @@ export function buildMemoryNoteSections(
 }
 
 export function buildExportPayload(args: {
+  notebookTitle?: string;
   modeLabel: string;
   files: MemoryNoteExportPayload["files"];
   vocabulary: VocabularyEntry[];
@@ -46,6 +48,12 @@ export function buildExportPayload(args: {
   meaningRounds: number;
 }): MemoryNoteExportPayload {
   return {
+    notebookTitle:
+      args.notebookTitle?.trim() ||
+      deriveNotebookTitle({
+        files: args.files,
+        vocabulary: args.vocabulary
+      }),
     modeLabel: args.modeLabel,
     files: args.files,
     vocabulary: args.vocabulary,
@@ -57,6 +65,37 @@ export function buildExportPayload(args: {
       args.meaningRounds
     )
   };
+}
+
+export function deriveNotebookTitle(args: {
+  rawTexts?: Array<{ fileName: string; text: string }>;
+  files: UploadedFileSummary[];
+  vocabulary: VocabularyEntry[];
+}) {
+  const candidateFromText = args.rawTexts
+    ?.flatMap((entry) => entry.text.split(/\r?\n/))
+    .map((line) => normalizeTitleCandidate(line))
+    .find((line) => isNotebookTitleCandidate(line));
+
+  if (candidateFromText) {
+    return candidateFromText;
+  }
+
+  if (args.vocabulary.length > 0) {
+    const firstWord = args.vocabulary[0]?.word?.trim();
+    if (firstWord) {
+      return args.vocabulary.length === 1
+        ? `${firstWord} 단어장`
+        : `${firstWord} 외 ${args.vocabulary.length - 1}개 단어`;
+    }
+  }
+
+  const firstFileName = args.files[0]?.name?.replace(/\.[^.]+$/, "").trim();
+  if (firstFileName) {
+    return firstFileName;
+  }
+
+  return "영단어 연습노트";
 }
 
 export function paginateRows<T>(rows: T[], size = MEMORY_NOTE_ROWS_PER_PAGE) {
@@ -104,4 +143,32 @@ function clampRoundCount(value: number) {
   }
 
   return Math.max(0, Math.min(10, Math.floor(value)));
+}
+
+function normalizeTitleCandidate(value: string) {
+  return value.replace(/\s+/g, " ").replace(/^[\s\-–—:|[\]()]+|[\s\-–—:|[\]()]+$/g, "").trim();
+}
+
+function isNotebookTitleCandidate(value: string | undefined): value is string {
+  if (!value) {
+    return false;
+  }
+
+  if (value.length < 4 || value.length > 40) {
+    return false;
+  }
+
+  if (!/[A-Za-z가-힣]/.test(value)) {
+    return false;
+  }
+
+  if (/^[0-9\s./_-]+$/.test(value)) {
+    return false;
+  }
+
+  if (/[,:;].+[,:;]/.test(value)) {
+    return false;
+  }
+
+  return true;
 }

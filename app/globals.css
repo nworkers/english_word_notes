@@ -152,6 +152,123 @@ input {
   gap: 12px;
 }
 
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.settings-trigger-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid rgba(139, 71, 24, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.82);
+}
+
+.settings-summary {
+  display: grid;
+  gap: 6px;
+}
+
+.settings-summary p:last-child {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.settings-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid rgba(139, 71, 24, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 253, 248, 0.88);
+}
+
+.settings-card h3 {
+  margin: 0;
+}
+
+.settings-field {
+  display: grid;
+  gap: 6px;
+}
+
+.settings-field span {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.settings-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  color: var(--ink);
+}
+
+.settings-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(31, 29, 26, 0.42);
+  backdrop-filter: blur(6px);
+}
+
+.settings-modal {
+  width: min(920px, 100%);
+  max-height: min(85vh, 920px);
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid rgba(139, 71, 24, 0.14);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--panel) 92%, white 8%);
+  box-shadow: var(--shadow);
+}
+
+.settings-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.settings-modal-header h2 {
+  margin: 0;
+  font-size: 1.55rem;
+}
+
+.settings-modal-body {
+  display: grid;
+  gap: 16px;
+}
+
+.settings-modal-close {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: white;
+  color: var(--ink);
+  padding: 9px 14px;
+  cursor: pointer;
+}
+
 .export-count-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -307,6 +424,29 @@ input {
 .summary-card {
   padding: 20px;
   margin-bottom: 18px;
+}
+
+.title-field {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.title-field span {
+  font-weight: 700;
+}
+
+.title-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  color: var(--ink);
+}
+
+.title-field small {
+  color: var(--muted);
 }
 
 .progress-card,
@@ -584,6 +724,21 @@ input {
   .panel-note {
     max-width: none;
     text-align: left;
+  }
+
+  .settings-trigger-row,
+  .settings-modal-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-backdrop {
+    padding: 16px;
+  }
+
+  .settings-modal {
+    padding: 18px;
+    max-height: 90vh;
   }
 
   .note-row {

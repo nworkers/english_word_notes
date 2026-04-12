@@ -97,7 +97,7 @@ export function buildWorkbookXml(payload: MemoryNoteExportPayload) {
   xmlns:html="http://www.w3.org/TR/REC-html40">
   <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
     <Author>OpenAI Codex</Author>
-    <Title>${escapeXml(`영단어 연습노트 - ${payload.modeLabel}`)}</Title>
+    <Title>${escapeXml(payload.notebookTitle)}</Title>
   </DocumentProperties>
   <Styles>
     <Style ss:ID="Default" ss:Name="Normal">
@@ -147,10 +147,10 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
       const page = pdfDoc.addPage([A4_WIDTH, A4_HEIGHT]);
       const sectionPageNumber = `${pageIndex + 1}/${pages.length}`;
 
-      await drawTextLine(page, textRenderer, "영단어 연습노트", {
+      await drawTextLine(page, textRenderer, payload.notebookTitle, {
         x: PAGE_MARGIN,
         y: A4_HEIGHT - 36,
-        size: 9,
+        size: 9.5,
         color: rgb(0, 0, 0)
       });
 
@@ -164,7 +164,7 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
       await drawTextLine(
         page,
         textRenderer,
-        `페이지 ${sectionPageNumber}  ·  ${payload.modeLabel}`,
+        `페이지 ${sectionPageNumber}`,
         {
           x: PAGE_MARGIN,
           y: A4_HEIGHT - 70,
@@ -473,10 +473,10 @@ async function appendAnswerKeyPages(
     const page = pdfDoc.addPage([A4_WIDTH, A4_HEIGHT]);
     const sectionPageNumber = `${pageIndex + 1}/${pages.length}`;
 
-    await drawTextLine(page, textRenderer, "영단어 연습노트", {
+    await drawTextLine(page, textRenderer, payload.notebookTitle, {
       x: PAGE_MARGIN,
       y: A4_HEIGHT - 36,
-      size: 9,
+      size: 9.5,
       color: rgb(0, 0, 0)
     });
 
@@ -490,7 +490,7 @@ async function appendAnswerKeyPages(
     await drawTextLine(
       page,
       textRenderer,
-      `원본 추출 순서  ·  페이지 ${sectionPageNumber}  ·  ${payload.modeLabel}`,
+      `원본 추출 순서  ·  페이지 ${sectionPageNumber}`,
       {
         x: PAGE_MARGIN,
         y: A4_HEIGHT - 70,

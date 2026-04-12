@@ -15,6 +15,7 @@ export type VocabularyEntry = {
 };
 
 export type ExtractionResponse = {
+  notebookTitle?: string;
   modeLabel: string;
   files: UploadedFileSummary[];
   vocabulary: VocabularyEntry[];
@@ -38,9 +39,24 @@ export type MemoryNoteSectionData = {
 };
 
 export type MemoryNoteExportPayload = {
+  notebookTitle: string;
   modeLabel: string;
   files: UploadedFileSummary[];
   vocabulary: VocabularyEntry[];
   warnings: string[];
   sections: MemoryNoteSectionData[];
+};
+
+export type ProviderSettings = {
+  ollamaBaseUrl: string;
+  ollamaModel: string;
+  ollamaVisionModel: string;
+  ollamaTimeoutMs: number;
+  ollamaVisionMaxWidth: number;
+  ollamaVisionQuality: number;
+  geminiApiKey: string;
+  geminiModel: string;
+  geminiVisionModel: string;
+  geminiBaseUrl: string;
+  geminiTimeoutMs: number;
 };

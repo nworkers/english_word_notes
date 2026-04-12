@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   buildMemoryNoteSections,
+  deriveNotebookTitle,
   formatMeaningPrompt,
   MEMORY_NOTE_ROWS_PER_PAGE,
   paginateRows
@@ -11,11 +12,26 @@ import type {
   ExtractionResponse,
   MemoryNoteExportPayload,
   MemoryNoteRow,
+  ProviderSettings,
   UploadedFileSummary
 } from "@/lib/types";
 
 const acceptedTypes = "image/png,image/jpeg";
 const idleLogs = ["[준비됨] 이미지를 선택하고 단어장 생성을 누르면 처리 로그가 여기에 표시됩니다."];
+const providerSettingsStorageKey = "english-memory-note-maker.provider-settings";
+const defaultProviderSettings: ProviderSettings = {
+  ollamaBaseUrl: "http://127.0.0.1:11434",
+  ollamaModel: "gemma4:e4b",
+  ollamaVisionModel: "qwen3.5:9b",
+  ollamaTimeoutMs: 120000,
+  ollamaVisionMaxWidth: 1024,
+  ollamaVisionQuality: 4,
+  geminiApiKey: "",
+  geminiModel: "gemini-2.5-flash",
+  geminiVisionModel: "gemini-2.5-flash",
+  geminiBaseUrl: "https://generativelanguage.googleapis.com/v1beta",
+  geminiTimeoutMs: 120000
+};
 
 type ExtractionJobSnapshot = {
   id: string;
@@ -35,7 +51,9 @@ export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [result, setResult] = useState<ExtractionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<"ocr" | "ocr+ollama" | "ollama-vision">("ollama-vision");
+  const [mode, setMode] = useState<
+    "ocr" | "ocr+ollama" | "ollama-vision" | "ocr+gemini" | "gemini-vision"
+  >("ollama-vision");
   const [isPending, startTransition] = useTransition();
   const [wordRows, setWordRows] = useState<MemoryNoteRow[]>([]);
   const [meaningRows, setMeaningRows] = useState<MemoryNoteRow[]>([]);
@@ -54,6 +72,9 @@ export default function HomePage() {
   const [totalFiles, setTotalFiles] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [totalSteps, setTotalSteps] = useState(0);
+  const [providerSettings, setProviderSettings] = useState<ProviderSettings>(defaultProviderSettings);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [customNotebookTitle, setCustomNotebookTitle] = useState("");
 
   const fileSummaries: UploadedFileSummary[] = files.map((file) => ({
     name: file.name,
@@ -77,6 +98,48 @@ export default function HomePage() {
       ...idleLogs
     ]);
   }
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(providerSettingsStorageKey);
+    if (!stored) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as Partial<ProviderSettings>;
+      setProviderSettings({
+        ...defaultProviderSettings,
+        ...parsed
+      });
+    } catch {
+      window.localStorage.removeItem(providerSettingsStorageKey);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(providerSettingsStorageKey, JSON.stringify(providerSettings));
+  }, [providerSettings]);
+
+  useEffect(() => {
+    if (!isSettingsOpen) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSettingsOpen(false);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSettingsOpen]);
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -103,6 +166,7 @@ export default function HomePage() {
           formData.append("files", file);
         });
         formData.append("mode", mode);
+        formData.append("providerSettings", JSON.stringify(providerSettings));
 
         const response = await fetch("/api/extract", {
           method: "POST",
@@ -175,6 +239,7 @@ export default function HomePage() {
       setMeaningRows([]);
       setWordRounds(3);
       setMeaningRounds(3);
+      setCustomNotebookTitle("");
       return;
     }
 
@@ -199,6 +264,14 @@ export default function HomePage() {
 
     setWordRounds(3);
     setMeaningRounds(3);
+    setCustomNotebookTitle(
+      result.notebookTitle ||
+        deriveNotebookTitle({
+          rawTexts: result.rawTexts,
+          files: result.files,
+          vocabulary: result.vocabulary
+        })
+    );
   }, [result]);
 
   const previewSections = useMemo(
@@ -212,13 +285,21 @@ export default function HomePage() {
     }
 
     return {
+      notebookTitle:
+        customNotebookTitle.trim() ||
+        result.notebookTitle ||
+        deriveNotebookTitle({
+          rawTexts: result.rawTexts,
+          files: result.files,
+          vocabulary: result.vocabulary
+        }),
       modeLabel: result.modeLabel,
       files: result.files,
       vocabulary: result.vocabulary,
       warnings: result.warnings,
       sections: previewSections
     };
-  }, [previewSections, result]);
+  }, [customNotebookTitle, previewSections, result]);
 
   function handleLoadSample() {
     if (!selectedSample) {
@@ -422,13 +503,46 @@ export default function HomePage() {
                 <input
                   type="radio"
                   name="mode"
+                  value="ocr+gemini"
+                  checked={mode === "ocr+gemini"}
+                  onChange={() => setMode("ocr+gemini")}
+                />
+                OCR + Gemini
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="mode"
                   value="ollama-vision"
                   checked={mode === "ollama-vision"}
                   onChange={() => setMode("ollama-vision")}
                 />
                 Ollama Vision only
               </label>
+              <label>
+                <input
+                  type="radio"
+                  name="mode"
+                  value="gemini-vision"
+                  checked={mode === "gemini-vision"}
+                  onChange={() => setMode("gemini-vision")}
+                />
+                Gemini Vision only
+              </label>
             </div>
+          </div>
+          <div className="settings-trigger-row">
+            <div className="settings-summary">
+              <p className="section-label">모델 설정</p>
+              <p>Ollama / Gemini 설정은 팝업에서 관리되며 현재 브라우저에 저장됩니다.</p>
+            </div>
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => setIsSettingsOpen(true)}
+            >
+              설정 열기
+            </button>
           </div>
           <label className="upload-box" htmlFor="files">
             <span className="upload-title">JPG 또는 PNG 파일 여러 개 선택</span>
@@ -519,6 +633,176 @@ export default function HomePage() {
         </form>
       </section>
 
+      {isSettingsOpen ? (
+        <div
+          className="settings-backdrop"
+          onClick={() => setIsSettingsOpen(false)}
+          role="presentation"
+        >
+          <section
+            className="settings-modal"
+            onClick={(event) => event.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="provider-settings-title"
+          >
+            <div className="settings-modal-header">
+              <div>
+                <p className="section-label">모델 설정</p>
+                <h2 id="provider-settings-title">Ollama / Gemini 설정</h2>
+              </div>
+              <button
+                className="settings-modal-close"
+                type="button"
+                onClick={() => setIsSettingsOpen(false)}
+                aria-label="설정 닫기"
+              >
+                닫기
+              </button>
+            </div>
+            <div className="settings-modal-body">
+              <div className="settings-grid">
+                <section className="settings-card">
+                  <h3>Ollama</h3>
+                  <label className="settings-field">
+                    <span>Base URL</span>
+                    <input
+                      type="text"
+                      value={providerSettings.ollamaBaseUrl}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          ollamaBaseUrl: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>텍스트 모델</span>
+                    <input
+                      type="text"
+                      value={providerSettings.ollamaModel}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          ollamaModel: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>Vision 모델</span>
+                    <input
+                      type="text"
+                      value={providerSettings.ollamaVisionModel}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          ollamaVisionModel: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>Timeout(ms)</span>
+                    <input
+                      type="number"
+                      min={1000}
+                      value={providerSettings.ollamaTimeoutMs}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          ollamaTimeoutMs: clampPositiveNumber(
+                            Number(event.target.value),
+                            defaultProviderSettings.ollamaTimeoutMs
+                          )
+                        }))
+                      }
+                    />
+                  </label>
+                </section>
+
+                <section className="settings-card">
+                  <h3>Gemini</h3>
+                  <label className="settings-field">
+                    <span>API Key</span>
+                    <input
+                      type="password"
+                      value={providerSettings.geminiApiKey}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          geminiApiKey: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>Base URL</span>
+                    <input
+                      type="text"
+                      value={providerSettings.geminiBaseUrl}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          geminiBaseUrl: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>텍스트 모델</span>
+                    <input
+                      type="text"
+                      value={providerSettings.geminiModel}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          geminiModel: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>Vision 모델</span>
+                    <input
+                      type="text"
+                      value={providerSettings.geminiVisionModel}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          geminiVisionModel: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
+                    <span>Timeout(ms)</span>
+                    <input
+                      type="number"
+                      min={1000}
+                      value={providerSettings.geminiTimeoutMs}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          geminiTimeoutMs: clampPositiveNumber(
+                            Number(event.target.value),
+                            defaultProviderSettings.geminiTimeoutMs
+                          )
+                        }))
+                      }
+                    />
+                  </label>
+                  <p className="settings-note">
+                    설정값은 현재 브라우저의 로컬 저장소에 저장됩니다.
+                  </p>
+                </section>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
       <section className="panel">
         <div className="panel-header">
           <div>
@@ -566,7 +850,11 @@ export default function HomePage() {
 
         {result ? (
           <>
-            <ResultSummary result={result} />
+            <ResultSummary
+              result={result}
+              notebookTitle={exportPayload?.notebookTitle ?? customNotebookTitle}
+              onNotebookTitleChange={setCustomNotebookTitle}
+            />
             {result.warnings.length > 0 ? (
               <section className="warning-card non-print">
                 <h3>확인 필요</h3>
@@ -598,10 +886,28 @@ export default function HomePage() {
   );
 }
 
-function ResultSummary({ result }: { result: ExtractionResponse }) {
+function ResultSummary({
+  result,
+  notebookTitle,
+  onNotebookTitleChange
+}: {
+  result: ExtractionResponse;
+  notebookTitle: string;
+  onNotebookTitleChange: (value: string) => void;
+}) {
   return (
     <section className="summary-card non-print">
       <h3>추출 요약</h3>
+      <label className="title-field">
+        <span>내보내기 제목</span>
+        <input
+          type="text"
+          value={notebookTitle}
+          onChange={(event) => onNotebookTitleChange(event.target.value)}
+          placeholder="PDF / XLS에 사용할 제목"
+        />
+        <small>여기서 수정한 제목이 PDF와 XLS 상단 제목에 그대로 반영됩니다.</small>
+      </label>
       <ul className="summary-list">
         <li>업로드 파일 수: {result.files.length}</li>
         <li>추출 단어 수: {result.vocabulary.length}</li>
@@ -735,6 +1041,14 @@ function clampRoundCount(value: number) {
   }
 
   return Math.max(0, Math.min(10, Math.floor(value)));
+}
+
+function clampPositiveNumber(value: number, fallback: number) {
+  if (!Number.isFinite(value) || value <= 0) {
+    return fallback;
+  }
+
+  return Math.floor(value);
 }
 
 function delay(ms: number) {
