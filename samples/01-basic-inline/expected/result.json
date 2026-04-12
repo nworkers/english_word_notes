@@ -1,0 +1,411 @@
+{
+  "case": "01-basic-inline",
+  "status": "final",
+  "source": "ocr-review",
+  "files": [
+    {
+      "fileName": "KakaoTalk_20260331_230102798.jpg",
+      "entries": [
+        {
+          "word": "anger",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "화, 분노" }
+          ]
+        },
+        {
+          "word": "bit",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "(a ~) 조금, 약간" }
+          ]
+        },
+        {
+          "word": "comfort",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "편안함; 위로, 위안" },
+            { "partOfSpeech": "동사", "meaning": "위로하다" }
+          ]
+        },
+        {
+          "word": "delight",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "기쁨" },
+            { "partOfSpeech": "동사", "meaning": "기쁘게 하다" }
+          ]
+        },
+        {
+          "word": "hunger",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "굶주림, 기아" }
+          ]
+        },
+        {
+          "word": "shock",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "충격" },
+            { "partOfSpeech": "동사", "meaning": "충격을 주다" }
+          ]
+        },
+        {
+          "word": "calm",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "침착, 평온" },
+            { "partOfSpeech": "형용사", "meaning": "침착한, 평온한" },
+            { "partOfSpeech": "동사", "meaning": "진정시키다" }
+          ]
+        },
+        {
+          "word": "appear",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "~인 것 같다[보이다]; 나타나다" }
+          ]
+        },
+        {
+          "word": "disappoint",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "실망시키다" }
+          ]
+        },
+        {
+          "word": "embarrass",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "당황하게 하다" }
+          ]
+        }
+      ]
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_01.jpg",
+      "entries": [
+        {
+          "word": "regret",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "후회하다, 유감이다" },
+            { "partOfSpeech": "명사", "meaning": "후회, 유감" }
+          ]
+        },
+        {
+          "word": "scare",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "겁주다" },
+            { "partOfSpeech": "명사", "meaning": "겁, 공포" }
+          ]
+        },
+        {
+          "word": "cheerful",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "발랄한, 쾌활한" }
+          ]
+        },
+        {
+          "word": "confused",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "혼란스러워하는" }
+          ]
+        },
+        {
+          "word": "crazy",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "미친; 화난; 열광적인(about)" }
+          ]
+        },
+        {
+          "word": "curious",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "궁금한, 호기심 많은; 이상한" }
+          ]
+        },
+        {
+          "word": "pleasant",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "즐거운, 쾌적한, 상냥한" }
+          ]
+        },
+        {
+          "word": "silly",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "어리석은; 유치한" }
+          ]
+        },
+        {
+          "word": "sincere",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "진실된[진심의]" }
+          ]
+        },
+        {
+          "word": "satisfied",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "만족하는" }
+          ]
+        }
+      ]
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_02.jpg",
+      "entries": [
+        {
+          "word": "barber",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "이발사" }
+          ]
+        },
+        {
+          "word": "behavior",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "태도, 행동" }
+          ]
+        },
+        {
+          "word": "boss",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "(직장의) 상사" }
+          ]
+        },
+        {
+          "word": "director",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "임원(이사); 책임자, 감독" }
+          ]
+        },
+        {
+          "word": "engineer",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "엔지니어[기사]" }
+          ]
+        },
+        {
+          "word": "expert",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "전문가" },
+            { "partOfSpeech": "형용사", "meaning": "전문가의, 숙련된" }
+          ]
+        },
+        {
+          "word": "personality",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "성격, 개성, 유명인" }
+          ]
+        },
+        {
+          "word": "option",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "선택(권); 선택 과목" }
+          ]
+        },
+        {
+          "word": "position",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "자세; 입장[태도]; 자리, 위치; 직업, 직책" }
+          ]
+        },
+        {
+          "word": "reporter",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "기자, 리포터" }
+          ]
+        }
+      ]
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_03.jpg",
+      "entries": [
+        {
+          "word": "sailor",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "선원" }
+          ]
+        },
+        {
+          "word": "university",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "대학" }
+          ]
+        },
+        {
+          "word": "worker",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "근로자" }
+          ]
+        },
+        {
+          "word": "offer",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "제안하다; 제공하다" },
+            { "partOfSpeech": "명사", "meaning": "제안" }
+          ]
+        },
+        {
+          "word": "remain",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "계속 ~이다; 남다" }
+          ]
+        },
+        {
+          "word": "familiar",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "잘 알고 있는; 친숙한" }
+          ]
+        },
+        {
+          "word": "active",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "활동적인, 적극적인" }
+          ]
+        },
+        {
+          "word": "principal",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "주요한, 주된" },
+            { "partOfSpeech": "명사", "meaning": "교장" }
+          ]
+        },
+        {
+          "word": "responsible",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "책임이 있는; 책임감 있는" }
+          ]
+        },
+        {
+          "word": "silent",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "조용한, 침묵을 지키는" }
+          ]
+        }
+      ]
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_04.jpg",
+      "entries": [
+        {
+          "word": "ability",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "능력[할 수 있음], 기량" }
+          ]
+        },
+        {
+          "word": "aim",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "목표; 조준" },
+            { "partOfSpeech": "동사", "meaning": "목표[겨냥]하다" }
+          ]
+        },
+        {
+          "word": "decision",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "결정[판단]" }
+          ]
+        },
+        {
+          "word": "difficulty",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "어려움, 곤란" }
+          ]
+        },
+        {
+          "word": "effort",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "수고, 노력" }
+          ]
+        },
+        {
+          "word": "experience",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "경험" },
+            { "partOfSpeech": "동사", "meaning": "경험하다" }
+          ]
+        },
+        {
+          "word": "passion",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "열정" }
+          ]
+        },
+        {
+          "word": "risk",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "위험(요소)" },
+            { "partOfSpeech": "동사", "meaning": "위험을 무릅쓰다" }
+          ]
+        },
+        {
+          "word": "vision",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "선견지명[통찰력]; 시력; 상상" }
+          ]
+        },
+        {
+          "word": "youth",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "젊음; 젊은이들[청년층]" }
+          ]
+        }
+      ]
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_05.jpg",
+      "entries": [
+        {
+          "word": "achieve",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "성취하다, 획득하다" }
+          ]
+        },
+        {
+          "word": "encourage",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "격려하다; 부추기다[장려하다]" }
+          ]
+        },
+        {
+          "word": "focus",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "집중하다[시키다]" },
+            { "partOfSpeech": "명사", "meaning": "초점[중심]" }
+          ]
+        },
+        {
+          "word": "overcome",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "극복하다" }
+          ]
+        },
+        {
+          "word": "require",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "필요로 하다, 요구하다" }
+          ]
+        },
+        {
+          "word": "succeed",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "성공하다(in); 뒤를 잇다" }
+          ]
+        },
+        {
+          "word": "challenging",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "도전적인, 힘든" }
+          ]
+        },
+        {
+          "word": "impossible",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "불가능한, 난감한, 참을 수 없는" }
+          ]
+        },
+        {
+          "word": "positive",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "긍정적인, 확신하는" }
+          ]
+        },
+        {
+          "word": "talented",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "재능 있는, 타고난" }
+          ]
+        }
+      ]
+    }
+  ]
+}

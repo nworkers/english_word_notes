@@ -1,0 +1,270 @@
+{
+  "case": "01-basic-inline",
+  "generatedAt": "2026-04-12T04:08:45.639Z",
+  "mode": "Ollama Vision",
+  "warnings": [
+    "Derivatives and synonyms excluded as per instructions.",
+    "Ollama Vision 실패 (KakaoTalk_20260331_230102798_04.jpg): This operation was aborted"
+  ],
+  "summary": {
+    "fileCount": 6,
+    "expectedEntries": 60,
+    "actualEntries": 50,
+    "matchedEntries": 46,
+    "missingEntries": 14,
+    "unexpectedEntries": 4
+  },
+  "files": [
+    {
+      "fileName": "KakaoTalk_20260331_230102798.jpg",
+      "expectedCount": 10,
+      "actualCount": 10,
+      "matchedCount": 10,
+      "missing": [],
+      "unexpected": [],
+      "rawModelOutput": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"anger\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"화, 분노\"\n        }\n      ]\n    },\n    {\n      \"word\": \"bit\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"(a ~) 조금, 약간\"\n        }\n      ]\n    },\n    {\n      \"word\": \"comfort\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"편안함; 위로, 위안\"\n        },\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"위로하다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"delight\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"기쁨\"\n        },\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"기쁘게 하다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"hunger\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"굶주림, 기아\"\n        }\n      ]\n    },\n    {\n      \"word\": \"shock\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"충격\"\n        },\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"충격을 주다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"calm\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"침착(한), 평온(한)\"\n        },\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"침착(한), 평온(한)\"\n        },\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"진정시키다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"appear\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"~인 것 같다[보이다]; 나타나다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"disappoint\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"실망시키다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"embarrass\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"당황하게 하다\"\n        }\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+      "rawTextPreview": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"anger\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"화, 분노\"\n        }\n      ]\n    },\n    {\n      \"word\": \"bit\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"(a ~) 조금, 약간\"\n        }\n      ]\n    },\n    {\n      \"word\": \"comfort\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"편안함; 위로, 위안\"\n        },\n        {\n          \"partOfSpeech\": \"동사\",\n          ",
+      "warnings": []
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_01.jpg",
+      "expectedCount": 10,
+      "actualCount": 10,
+      "matchedCount": 9,
+      "missing": [
+        {
+          "word": "crazy",
+          "senses": [
+            {
+              "partOfSpeech": "형용사",
+              "meaning": "미친; 화난; 열광적인(about)"
+            }
+          ]
+        }
+      ],
+      "unexpected": [
+        {
+          "word": "crazy",
+          "senses": [
+            {
+              "partOfSpeech": "형용사",
+              "meaning": "미친, 화난, 열광적인(about)"
+            }
+          ]
+        }
+      ],
+      "rawModelOutput": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"regret\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"후회하다, 유감이다\"\n        },\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"후회, 유감\"\n        }\n      ]\n    },\n    {\n      \"word\": \"scare\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"겁주다\"\n        },\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"겁, 공포\"\n        }\n      ]\n    },\n    {\n      \"word\": \"cheerful\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"발랄한, 쾌활한\"\n        }\n      ]\n    },\n    {\n      \"word\": \"confused\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"혼란스러워하는\"\n        }\n      ]\n    },\n    {\n      \"word\": \"crazy\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"미친, 화난, 열광적인(about)\"\n        }\n      ]\n    },\n    {\n      \"word\": \"curious\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"궁금한, 호기심 많은; 이상한\"\n        }\n      ]\n    },\n    {\n      \"word\": \"pleasant\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"즐거운, 쾌적한, 상냥한\"\n        }\n      ]\n    },\n    {\n      \"word\": \"silly\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"어리석은; 유치한\"\n        }\n      ]\n    },\n    {\n      \"word\": \"sincere\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"진실된[진심의]\"\n        }\n      ]\n    },\n    {\n      \"word\": \"satisfied\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"만족하는\"\n        }\n      ]\n    }\n  ],\n  \"warnings\": [\n    \"Derivatives and synonyms excluded as per instructions.\"\n  ]\n}",
+      "rawTextPreview": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"regret\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"후회하다, 유감이다\"\n        },\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"후회, 유감\"\n        }\n      ]\n    },\n    {\n      \"word\": \"scare\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"겁주다\"\n        },\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"겁, 공포\"\n        }\n      ]\n    },\n    {\n      \"word\": \"chee",
+      "warnings": [
+        "Derivatives and synonyms excluded as per instructions."
+      ]
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_02.jpg",
+      "expectedCount": 10,
+      "actualCount": 10,
+      "matchedCount": 9,
+      "missing": [
+        {
+          "word": "director",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "임원(이사); 책임자, 감독"
+            }
+          ]
+        }
+      ],
+      "unexpected": [
+        {
+          "word": "director",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "임원[이사]; 책임자, 감독"
+            }
+          ]
+        }
+      ],
+      "rawModelOutput": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"barber\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"이발사\"\n        }\n      ]\n    },\n    {\n      \"word\": \"behavior\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"태도, 행동\"\n        }\n      ]\n    },\n    {\n      \"word\": \"boss\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"(직장의) 상사\"\n        }\n      ]\n    },\n    {\n      \"word\": \"director\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"임원[이사]; 책임자, 감독\"\n        }\n      ]\n    },\n    {\n      \"word\": \"engineer\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"엔지니어[기사]\"\n        }\n      ]\n    },\n    {\n      \"word\": \"expert\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"전문가\"\n        },\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"전문가의, 숙련된\"\n        }\n      ]\n    },\n    {\n      \"word\": \"personality\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"성격, 개성, 유명인\"\n        }\n      ]\n    },\n    {\n      \"word\": \"option\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"선택(권); 선택 과목\"\n        }\n      ]\n    },\n    {\n      \"word\": \"position\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"자세; 입장[태도]; 자리, 위치; 직업, 직책\"\n        }\n      ]\n    },\n    {\n      \"word\": \"reporter\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"기자, 리포터\"\n        }\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+      "rawTextPreview": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"barber\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"이발사\"\n        }\n      ]\n    },\n    {\n      \"word\": \"behavior\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"태도, 행동\"\n        }\n      ]\n    },\n    {\n      \"word\": \"boss\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"(직장의) 상사\"\n        }\n      ]\n    },\n    {\n      \"word\": \"director\",\n      \"senses\"",
+      "warnings": []
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_03.jpg",
+      "expectedCount": 10,
+      "actualCount": 10,
+      "matchedCount": 10,
+      "missing": [],
+      "unexpected": [],
+      "rawModelOutput": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"sailor\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"선원\"\n        }\n      ]\n    },\n    {\n      \"word\": \"university\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"대학\"\n        }\n      ]\n    },\n    {\n      \"word\": \"worker\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"근로자\"\n        }\n      ]\n    },\n    {\n      \"word\": \"offer\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"제안하다; 제공하다\"\n        },\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"제안\"\n        }\n      ]\n    },\n    {\n      \"word\": \"remain\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"계속 ~이다; 남다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"familiar\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"잘 알고 있는; 친숙한\"\n        }\n      ]\n    },\n    {\n      \"word\": \"active\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"활동적인, 적극적인\"\n        }\n      ]\n    },\n    {\n      \"word\": \"principal\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"주요한, 주된\"\n        },\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"교장\"\n        }\n      ]\n    },\n    {\n      \"word\": \"responsible\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"책임이 있는; 책임감 있는\"\n        }\n      ]\n    },\n    {\n      \"word\": \"silent\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"조용한, 침묵을 지키는\"\n        }\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+      "rawTextPreview": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"sailor\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"선원\"\n        }\n      ]\n    },\n    {\n      \"word\": \"university\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"대학\"\n        }\n      ]\n    },\n    {\n      \"word\": \"worker\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"근로자\"\n        }\n      ]\n    },\n    {\n      \"word\": \"offer\",\n      \"senses\": [\n     ",
+      "warnings": []
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_04.jpg",
+      "expectedCount": 10,
+      "actualCount": 0,
+      "matchedCount": 0,
+      "missing": [
+        {
+          "word": "ability",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "능력[할 수 있음], 기량"
+            }
+          ]
+        },
+        {
+          "word": "aim",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "목표; 조준"
+            },
+            {
+              "partOfSpeech": "동사",
+              "meaning": "목표[겨냥]하다"
+            }
+          ]
+        },
+        {
+          "word": "decision",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "결정[판단]"
+            }
+          ]
+        },
+        {
+          "word": "difficulty",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "어려움, 곤란"
+            }
+          ]
+        },
+        {
+          "word": "effort",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "수고, 노력"
+            }
+          ]
+        },
+        {
+          "word": "experience",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "경험"
+            },
+            {
+              "partOfSpeech": "동사",
+              "meaning": "경험하다"
+            }
+          ]
+        },
+        {
+          "word": "passion",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "열정"
+            }
+          ]
+        },
+        {
+          "word": "risk",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "위험(요소)"
+            },
+            {
+              "partOfSpeech": "동사",
+              "meaning": "위험을 무릅쓰다"
+            }
+          ]
+        },
+        {
+          "word": "vision",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "선견지명[통찰력]; 시력; 상상"
+            }
+          ]
+        },
+        {
+          "word": "youth",
+          "senses": [
+            {
+              "partOfSpeech": "명사",
+              "meaning": "젊음; 젊은이들[청년층]"
+            }
+          ]
+        }
+      ],
+      "unexpected": [],
+      "rawModelOutput": "",
+      "rawTextPreview": "",
+      "warnings": [
+        "This operation was aborted"
+      ]
+    },
+    {
+      "fileName": "KakaoTalk_20260331_230102798_05.jpg",
+      "expectedCount": 10,
+      "actualCount": 10,
+      "matchedCount": 8,
+      "missing": [
+        {
+          "word": "succeed",
+          "senses": [
+            {
+              "partOfSpeech": "동사",
+              "meaning": "성공하다(in); 뒤를 잇다"
+            }
+          ]
+        },
+        {
+          "word": "positive",
+          "senses": [
+            {
+              "partOfSpeech": "형용사",
+              "meaning": "긍정적인, 확신하는"
+            }
+          ]
+        }
+      ],
+      "unexpected": [
+        {
+          "word": "succeed",
+          "senses": [
+            {
+              "partOfSpeech": "동사",
+              "meaning": "성공하다 (in); 뒤를 잇다"
+            }
+          ]
+        },
+        {
+          "word": "positive",
+          "senses": [
+            {
+              "partOfSpeech": "형용사",
+              "meaning": "긍정적인; 확신하는"
+            }
+          ]
+        }
+      ],
+      "rawModelOutput": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"achieve\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"성취하다, 획득하다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"encourage\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"격려하다; 부추기다[장려하다]\"\n        }\n      ]\n    },\n    {\n      \"word\": \"focus\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"집중하다[시키다]\"\n        },\n        {\n          \"partOfSpeech\": \"명사\",\n          \"meaning\": \"초점[중심]\"\n        }\n      ]\n    },\n    {\n      \"word\": \"overcome\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"극복하다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"require\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"필요로 하다, 요구하다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"succeed\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"성공하다 (in); 뒤를 잇다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"challenging\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"도전적인, 힘든\"\n        }\n      ]\n    },\n    {\n      \"word\": \"impossible\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"불가능한, 난감한, 참을 수 없는\"\n        }\n      ]\n    },\n    {\n      \"word\": \"positive\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"긍정적인; 확신하는\"\n        }\n      ]\n    },\n    {\n      \"word\": \"talented\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"형용사\",\n          \"meaning\": \"재능 있는, 타고난\"\n        }\n      ]\n    }\n  ],\n  \"warnings\": []\n}",
+      "rawTextPreview": "{\n  \"vocabulary\": [\n    {\n      \"word\": \"achieve\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"성취하다, 획득하다\"\n        }\n      ]\n    },\n    {\n      \"word\": \"encourage\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"격려하다; 부추기다[장려하다]\"\n        }\n      ]\n    },\n    {\n      \"word\": \"focus\",\n      \"senses\": [\n        {\n          \"partOfSpeech\": \"동사\",\n          \"meaning\": \"집중하다[시키다]\"\n        },\n        {\n          \"partOfSpeech\": \"명사",
+      "warnings": []
+    }
+  ]
+}
