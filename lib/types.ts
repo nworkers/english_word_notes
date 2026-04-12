@@ -24,3 +24,23 @@ export type ExtractionResponse = {
     text: string;
   }>;
 };
+
+export type MemoryNoteRow = {
+  sourceNumber: number;
+  prompt: string;
+  answerLabel: string;
+};
+
+export type MemoryNoteSectionData = {
+  title: string;
+  description: string;
+  rows: MemoryNoteRow[];
+};
+
+export type MemoryNoteExportPayload = {
+  modeLabel: string;
+  files: UploadedFileSummary[];
+  vocabulary: VocabularyEntry[];
+  warnings: string[];
+  sections: MemoryNoteSectionData[];
+};

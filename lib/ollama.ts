@@ -540,7 +540,7 @@ async function prepareVisionFiles(files: File[]) {
   for (const file of files) {
     const result = await resizeVisionFile(file, maxWidth, quality);
     preparedFiles.push(result.file);
-    if (result.warning) {
+    if ("warning" in result && result.warning) {
       warnings.push(result.warning);
     }
   }
@@ -591,7 +591,7 @@ async function resizeVisionFile(file: File, maxWidth: number, quality: number) {
     );
     const resizedBuffer = await readFile(outputPath);
     return {
-      file: new File([resizedBuffer], basename(file.name || "vision.jpg"), {
+      file: new File([new Uint8Array(resizedBuffer)], basename(file.name || "vision.jpg"), {
         type: "image/jpeg"
       })
     };
@@ -702,7 +702,7 @@ async function loadFileFromPath(imagePath: string) {
   const name = basename(imagePath);
   const type = inferMimeType(extname(imagePath));
 
-  return new File([buffer], name, { type });
+  return new File([new Uint8Array(buffer)], name, { type });
 }
 
 function inferMimeType(extension: string) {

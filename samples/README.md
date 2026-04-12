@@ -1,6 +1,6 @@
 # Sample Test Cases
 
-이 디렉토리는 OCR 및 단어-뜻 파싱 품질을 확인하기 위한 샘플 이미지 테스트 케이스를 저장하는 공간입니다.
+이 디렉토리는 OCR 및 단어-뜻 파싱 품질을 확인하기 위한 샘플 이미지 테스트 케이스를 저장하는 공간입니다. 현재 샘플 데이터는 웹 미리보기뿐 아니라 `PDF` / `XLS` 내보내기 검증의 입력 데이터로도 사용됩니다.
 
 ## 기본 구조
 
@@ -17,6 +17,7 @@ samples/<case-name>/
 
 - `images/`에는 실제 테스트할 `jpg`, `jpeg`, `png` 이미지를 넣습니다.
 - `expected/`에는 이미지에서 기대하는 추출 결과를 MD 또는 JSON으로 기록합니다.
+- `expected/result.json`의 항목 순서는 문제지 원본 번호와 정답지 번호의 기준이 됩니다.
 - 각 케이스의 `README.md`에는 테스트 의도와 확인 포인트를 남깁니다.
 
 ## 케이스 분류
@@ -39,10 +40,22 @@ samples/<case-name>/
 `expected/result.json`
 
 ```json
-[
-  { "word": "apple", "meaning": "사과" },
-  { "word": "bridge", "meaning": "다리" }
-]
+{
+  "case": "01-basic-inline",
+  "status": "final",
+  "source": "sample",
+  "files": [
+    {
+      "fileName": "01.jpg",
+      "entries": [
+        {
+          "word": "apple",
+          "senses": [{ "partOfSpeech": "n.", "meaning": "사과" }]
+        }
+      ]
+    }
+  ]
+}
 ```
 
 또는 `expected/notes.md`

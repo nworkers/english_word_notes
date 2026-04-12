@@ -225,7 +225,7 @@ async function loadFile(imagePath: string) {
   const name = path.basename(imagePath);
   const type = inferMimeType(imagePath);
 
-  return new File([buffer], name, { type });
+  return new File([new Uint8Array(buffer)], name, { type });
 }
 
 async function buildVisionOnlyBaseline(imagePaths: string[]) {
