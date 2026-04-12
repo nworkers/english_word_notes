@@ -15,6 +15,21 @@ import type {
 } from "@/lib/types";
 
 const acceptedTypes = "image/png,image/jpeg";
+const idleLogs = ["[준비됨] 이미지를 선택하고 단어장 생성을 누르면 처리 로그가 여기에 표시됩니다."];
+
+type ExtractionJobSnapshot = {
+  id: string;
+  status: "queued" | "running" | "completed" | "failed";
+  progress: number;
+  stage: string;
+  totalFiles: number;
+  processedFiles: number;
+  totalSteps: number;
+  currentStep: number;
+  logs: string[];
+  result: ExtractionResponse | null;
+  error: string | null;
+};
 
 export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
@@ -30,8 +45,15 @@ export default function HomePage() {
   const [selectedSample, setSelectedSample] = useState<string>("");
   const [isLoadingSample, setIsLoadingSample] = useState(false);
   const [exportingFormat, setExportingFormat] = useState<"pdf" | "xls" | null>(null);
-  const [wordRounds, setWordRounds] = useState(0);
-  const [meaningRounds, setMeaningRounds] = useState(0);
+  const [wordRounds, setWordRounds] = useState(3);
+  const [meaningRounds, setMeaningRounds] = useState(3);
+  const [progressValue, setProgressValue] = useState(0);
+  const [progressStage, setProgressStage] = useState("대기 중");
+  const [activityLogs, setActivityLogs] = useState<string[]>(idleLogs);
+  const [processedFiles, setProcessedFiles] = useState(0);
+  const [totalFiles, setTotalFiles] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [totalSteps, setTotalSteps] = useState(0);
 
   const fileSummaries: UploadedFileSummary[] = files.map((file) => ({
     name: file.name,
@@ -44,6 +66,16 @@ export default function HomePage() {
     setFiles(nextFiles);
     setResult(null);
     setError(null);
+    setProgressValue(0);
+    setProgressStage("대기 중");
+    setProcessedFiles(0);
+    setTotalFiles(nextFiles.length);
+    setCurrentStep(0);
+    setTotalSteps(0);
+    setActivityLogs([
+      `[파일 선택] ${nextFiles.length}개 파일이 선택되었습니다.`,
+      ...idleLogs
+    ]);
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -57,6 +89,14 @@ export default function HomePage() {
     startTransition(async () => {
       try {
         setError(null);
+        setProgressValue(2);
+        setProgressStage("업로드 준비");
+        setProcessedFiles(0);
+        setTotalFiles(files.length);
+        setActivityLogs([
+          `[업로드 준비] ${files.length}개 파일 업로드를 시작합니다.`,
+          `[모드] ${mode}`
+        ]);
 
         const formData = new FormData();
         files.forEach((file) => {
@@ -77,14 +117,27 @@ export default function HomePage() {
           throw new Error(payload?.message ?? "단어장 생성에 실패했습니다.");
         }
 
-        const data = (await response.json()) as ExtractionResponse;
-        setResult(data);
+        const payload = (await response.json()) as { jobId?: string; message?: string };
+        if (!payload.jobId) {
+          throw new Error(payload.message ?? "작업 ID를 받지 못했습니다.");
+        }
+
+        setProgressValue(4);
+        setProgressStage("작업 시작");
+        setActivityLogs((current) => [
+          ...current,
+          `[작업 시작] 서버 작업 ID: ${payload.jobId}`
+        ]);
+
+        await pollExtractionJob(payload.jobId);
       } catch (requestError) {
         setError(
           requestError instanceof Error
             ? requestError.message
             : "알 수 없는 오류가 발생했습니다."
         );
+        setProgressStage("실패");
+        setProgressValue(100);
       }
     });
   }
@@ -120,8 +173,8 @@ export default function HomePage() {
     if (!result) {
       setWordRows([]);
       setMeaningRows([]);
-      setWordRounds(0);
-      setMeaningRounds(0);
+      setWordRounds(3);
+      setMeaningRounds(3);
       return;
     }
 
@@ -144,8 +197,8 @@ export default function HomePage() {
       }))
     );
 
-    setWordRounds(1);
-    setMeaningRounds(1);
+    setWordRounds(3);
+    setMeaningRounds(3);
   }, [result]);
 
   const previewSections = useMemo(
@@ -188,6 +241,16 @@ export default function HomePage() {
       .then((data) => {
         setResult(data);
         setFiles([]);
+        setProgressValue(0);
+        setProgressStage("샘플 로드 완료");
+        setProcessedFiles(0);
+        setTotalFiles(0);
+        setCurrentStep(0);
+        setTotalSteps(0);
+        setActivityLogs([
+          `[샘플 로드] ${selectedSample} 샘플을 적용했습니다.`,
+          ...idleLogs
+        ]);
       })
       .catch((sampleError) => {
         setError(
@@ -248,10 +311,45 @@ export default function HomePage() {
     }
   }
 
+  async function pollExtractionJob(jobId: string) {
+    while (true) {
+      const response = await fetch(`/api/extract?jobId=${encodeURIComponent(jobId)}`, {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as
+          | { message?: string }
+          | null;
+        throw new Error(payload?.message ?? "작업 상태를 가져오지 못했습니다.");
+      }
+
+      const snapshot = (await response.json()) as ExtractionJobSnapshot;
+      setProgressValue(snapshot.progress);
+      setProgressStage(snapshot.stage);
+      setProcessedFiles(snapshot.processedFiles);
+      setTotalFiles(snapshot.totalFiles);
+      setCurrentStep(snapshot.currentStep);
+      setTotalSteps(snapshot.totalSteps);
+      setActivityLogs(snapshot.logs.length > 0 ? snapshot.logs : idleLogs);
+
+      if (snapshot.status === "completed") {
+        setResult(snapshot.result);
+        return;
+      }
+
+      if (snapshot.status === "failed") {
+        throw new Error(snapshot.error ?? "단어장 생성에 실패했습니다.");
+      }
+
+      await delay(700);
+    }
+  }
+
   return (
     <main className="page-shell">
       <section className="hero-card">
-        <p className="eyebrow">English Memory Note Maker</p>
+        <p className="eyebrow">영단어 연습노트</p>
         <h1>이미지 업로드로 암기용 단어장을 만드는 웹 초안</h1>
         <p className="hero-copy">
           여러 장의 단어 이미지 파일을 업로드하면 단어와 뜻 목록을 정리하고,
@@ -419,6 +517,38 @@ export default function HomePage() {
 
           {error ? <p className="error-text">{error}</p> : null}
         </form>
+      </section>
+
+      <section className="panel">
+        <div className="panel-header">
+          <div>
+            <p className="section-label">진행 상태</p>
+            <h2>처리 로그</h2>
+          </div>
+          <p className="panel-note">{progressStage}</p>
+        </div>
+
+        <div className="progress-card">
+          <div className="progress-meta">
+            <strong>생성 진행률</strong>
+            <span>{progressValue}%</span>
+          </div>
+          <div className="progress-stats">
+            <span>처리 파일: {processedFiles}/{totalFiles || files.length || 0}</span>
+            <span>남은 단계: {Math.max(totalSteps - currentStep, 0)}</span>
+          </div>
+          <div className="progress-track" aria-hidden="true">
+            <div className="progress-fill" style={{ width: `${progressValue}%` }} />
+          </div>
+        </div>
+
+        <section className="log-card">
+          <div className="log-list">
+            {activityLogs.map((log, index) => (
+              <p key={`${log}-${index}`}>{log}</p>
+            ))}
+          </div>
+        </section>
       </section>
 
       <section className="panel printable-area">
@@ -605,4 +735,10 @@ function clampRoundCount(value: number) {
   }
 
   return Math.max(0, Math.min(10, Math.floor(value)));
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
 }

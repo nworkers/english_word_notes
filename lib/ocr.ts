@@ -20,6 +20,15 @@ type OcrInput = {
   buffer: Buffer;
 };
 
+type ProgressCallbacks = {
+  onProgress?: (
+    progress: number,
+    stage: string,
+    message?: string,
+    details?: { processedFiles?: number; currentStep?: number }
+  ) => void;
+};
+
 export type OcrFileResult = {
   file: UploadedFileSummary;
   text: string;
@@ -48,17 +57,40 @@ async function createOcrWorker() {
   });
 }
 
-async function processOcrInputs(inputs: OcrInput[]): Promise<OcrDebugResult> {
+async function processOcrInputs(
+  inputs: OcrInput[],
+  callbacks?: ProgressCallbacks
+): Promise<OcrDebugResult> {
   const worker = await createOcrWorker();
 
   try {
     const fileResults: OcrFileResult[] = [];
+    callbacks?.onProgress?.(8, "OCR 준비", "OCR 워커를 초기화했습니다.", {
+      currentStep: 2
+    });
 
-    for (const input of inputs) {
+    for (const [inputIndex, input] of inputs.entries()) {
+      callbacks?.onProgress?.(
+        10 + Math.round((inputIndex / Math.max(inputs.length, 1)) * 60),
+        "이미지 전처리",
+        `${input.name} 전처리를 시작합니다.`,
+        { processedFiles: inputIndex, currentStep: 2 }
+      );
       const variants = await createImageVariants(input);
       const recognitions = [];
 
-      for (const variant of variants) {
+      for (const [variantIndex, variant] of variants.entries()) {
+        callbacks?.onProgress?.(
+          12 +
+            Math.round(
+              ((inputIndex + variantIndex / Math.max(variants.length, 1)) /
+                Math.max(inputs.length, 1)) *
+                60
+            ),
+          "OCR 인식",
+          `${input.name} - ${variant.label} 인식을 진행 중입니다.`,
+          { processedFiles: inputIndex, currentStep: 2 }
+        );
         recognitions.push({
           label: variant.label,
           result: await worker.recognize(variant.buffer)
@@ -80,8 +112,19 @@ async function processOcrInputs(inputs: OcrInput[]): Promise<OcrDebugResult> {
         entries: parsed.entries,
         warnings: parsed.warnings
       });
+
+      callbacks?.onProgress?.(
+        12 + Math.round(((inputIndex + 1) / Math.max(inputs.length, 1)) * 60),
+        "OCR 인식",
+        `${input.name} 처리가 완료되었습니다.`,
+        { processedFiles: inputIndex + 1, currentStep: 2 }
+      );
     }
 
+    callbacks?.onProgress?.(78, "결과 정리", "OCR 결과를 합치고 중복을 정리합니다.", {
+      processedFiles: inputs.length,
+      currentStep: 3
+    });
     const vocabulary = dedupeEntries(fileResults.flatMap((result) => result.entries));
     const rawTexts = fileResults.map((result) => ({
       fileName: result.file.name,
@@ -106,7 +149,14 @@ async function processOcrInputs(inputs: OcrInput[]): Promise<OcrDebugResult> {
   }
 }
 
-export async function extractVocabularyFromFiles(files: File[]): Promise<ExtractionResponse> {
+export async function extractVocabularyFromFiles(
+  files: File[],
+  callbacks?: ProgressCallbacks
+): Promise<ExtractionResponse> {
+  callbacks?.onProgress?.(5, "파일 준비", "업로드 파일을 서버에서 읽고 있습니다.", {
+    processedFiles: 0,
+    currentStep: 1
+  });
   const inputs = await Promise.all(
     files.map(async (file) => {
       const arrayBuffer = await file.arrayBuffer();
@@ -120,7 +170,11 @@ export async function extractVocabularyFromFiles(files: File[]): Promise<Extract
     })
   );
 
-  const result = await processOcrInputs(inputs);
+  const result = await processOcrInputs(inputs, callbacks);
+  callbacks?.onProgress?.(88, "결과 정리", "OCR 추출 결과를 응답 형식으로 정리합니다.", {
+    processedFiles: inputs.length,
+    currentStep: 3
+  });
 
   return {
     modeLabel: result.modeLabel,

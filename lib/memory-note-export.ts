@@ -97,7 +97,7 @@ export function buildWorkbookXml(payload: MemoryNoteExportPayload) {
   xmlns:html="http://www.w3.org/TR/REC-html40">
   <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
     <Author>OpenAI Codex</Author>
-    <Title>${escapeXml(`English Memory Note - ${payload.modeLabel}`)}</Title>
+    <Title>${escapeXml(`영단어 연습노트 - ${payload.modeLabel}`)}</Title>
   </DocumentProperties>
   <Styles>
     <Style ss:ID="Default" ss:Name="Normal">
@@ -147,7 +147,7 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
       const page = pdfDoc.addPage([A4_WIDTH, A4_HEIGHT]);
       const sectionPageNumber = `${pageIndex + 1}/${pages.length}`;
 
-      await drawTextLine(page, textRenderer, "English Memory Note", {
+      await drawTextLine(page, textRenderer, "영단어 연습노트", {
         x: PAGE_MARGIN,
         y: A4_HEIGHT - 36,
         size: 9,
@@ -473,7 +473,7 @@ async function appendAnswerKeyPages(
     const page = pdfDoc.addPage([A4_WIDTH, A4_HEIGHT]);
     const sectionPageNumber = `${pageIndex + 1}/${pages.length}`;
 
-    await drawTextLine(page, textRenderer, "English Memory Note", {
+    await drawTextLine(page, textRenderer, "영단어 연습노트", {
       x: PAGE_MARGIN,
       y: A4_HEIGHT - 36,
       size: 9,

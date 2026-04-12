@@ -11,6 +11,15 @@ type OllamaPostProcessResult = {
   warnings: string[];
 };
 
+type OllamaProgressCallbacks = {
+  onProgress?: (
+    progress: number,
+    stage: string,
+    message?: string,
+    details?: { currentStep?: number; processedFiles?: number }
+  ) => void;
+};
+
 const DEFAULT_OLLAMA_BASE_URL = "http://127.0.0.1:11434";
 const DEFAULT_OLLAMA_MODEL = "gemma4:e4b";
 const DEFAULT_OLLAMA_VISION_MODEL = "qwen3.5:9b";
@@ -23,8 +32,12 @@ export function isOllamaEnabled() {
 }
 
 export async function postProcessWithOllama(
-  extraction: ExtractionResponse
+  extraction: ExtractionResponse,
+  callbacks?: OllamaProgressCallbacks
 ): Promise<OllamaPostProcessResult> {
+  callbacks?.onProgress?.(90, "Ollama 후처리", "OCR 결과를 Ollama로 보정하고 있습니다.", {
+    currentStep: 4
+  });
   const allowedWords = new Set(
     extraction.vocabulary.map((entry) => entry.word.trim().toLowerCase()).filter(Boolean)
   );
@@ -60,6 +73,9 @@ export async function postProcessWithOllama(
     throw new Error("Ollama 응답 본문이 비어 있습니다.");
   }
 
+  callbacks?.onProgress?.(96, "Ollama 후처리", "Ollama 응답을 파싱하고 있습니다.", {
+    currentStep: 4
+  });
   const parsed = parseOllamaJson(content, allowedWords, ocrText);
 
   return {
@@ -68,7 +84,14 @@ export async function postProcessWithOllama(
   };
 }
 
-export async function extractWithOllamaVision(files: File[]) {
+export async function extractWithOllamaVision(
+  files: File[],
+  callbacks?: OllamaProgressCallbacks
+) {
+  callbacks?.onProgress?.(10, "비전 준비", "Vision 입력 이미지를 준비하고 있습니다.", {
+    currentStep: 1,
+    processedFiles: 0
+  });
   const baseUrl = process.env.OLLAMA_BASE_URL ?? DEFAULT_OLLAMA_BASE_URL;
   const model =
     process.env.OLLAMA_VISION_MODEL ??
@@ -76,7 +99,15 @@ export async function extractWithOllamaVision(files: File[]) {
     DEFAULT_OLLAMA_VISION_MODEL;
   const chatUrl = buildOllamaUrl(baseUrl, "/chat");
   const prepared = await prepareVisionFiles(files);
+  callbacks?.onProgress?.(35, "비전 준비", "Vision 입력 이미지를 인코딩하고 있습니다.", {
+    currentStep: 2,
+    processedFiles: prepared.files.length
+  });
   const encodedImages = await Promise.all(prepared.files.map(encodeFileToBase64));
+  callbacks?.onProgress?.(55, "Vision 추론", "Ollama Vision 모델에 이미지를 전송했습니다.", {
+    currentStep: 3,
+    processedFiles: prepared.files.length
+  });
   const response = await fetchWithTimeout(chatUrl, {
     method: "POST",
     headers: {
@@ -121,6 +152,10 @@ export async function extractWithOllamaVision(files: File[]) {
   }
 
   try {
+    callbacks?.onProgress?.(88, "Vision 파싱", "Vision 응답을 파싱하고 있습니다.", {
+      currentStep: 4,
+      processedFiles: prepared.files.length
+    });
     const parsed = parseOllamaJson(content, new Set(), "");
     return {
       vocabulary: parsed.vocabulary,
