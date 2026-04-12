@@ -27,6 +27,20 @@ export type ExtractionResponse = {
   }>;
 };
 
+export type SavedExtractionPreferences = {
+  wordRounds: number;
+  meaningRounds: number;
+  notebookTitle: string;
+};
+
+export type SavedExtractionSnapshot = {
+  format: "english-memory-note-extraction";
+  version: 1;
+  savedAt: string;
+  result: ExtractionResponse;
+  preferences: SavedExtractionPreferences;
+};
+
 export type MemoryNoteRow = {
   sourceNumber: number;
   prompt: string;

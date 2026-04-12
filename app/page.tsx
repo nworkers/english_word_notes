@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import {
   buildMemoryNoteSections,
   deriveNotebookTitle,
@@ -13,6 +13,8 @@ import type {
       MemoryNoteExportPayload,
       MemoryNoteRow,
       ProviderSettings,
+      SavedExtractionPreferences,
+      SavedExtractionSnapshot,
       UploadedFileSummary
 } from "@/lib/types";
 
@@ -20,10 +22,10 @@ const acceptedTypes = "image/png,image/jpeg";
 const idleLogs = ["[준비됨] 이미지를 선택하고 단어장 생성을 누르면 처리 로그가 여기에 표시됩니다."];
 const providerSettingsStorageKey = "english-memory-note-maker.provider-settings";
 const defaultProviderSettings: ProviderSettings = {
-  ollamaBaseUrl: "http://127.0.0.1:11434",
+  ollamaBaseUrl: "https://ollama.com/api/tags",
   ollamaApiKey: "",
-  ollamaModel: "gemma4:e4b",
-  ollamaVisionModel: "qwen3.5:9b",
+  ollamaModel: "gemma4:31b-cloud",
+  ollamaVisionModel: "gemma4:31b-cloud",
   ollamaTimeoutMs: 300000,
   ollamaVisionMaxWidth: 1024,
   ollamaVisionQuality: 4,
@@ -83,6 +85,9 @@ export default function HomePage() {
   const [providerSettings, setProviderSettings] = useState<ProviderSettings>(defaultProviderSettings);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [customNotebookTitle, setCustomNotebookTitle] = useState("");
+  const [pendingLoadedPreferences, setPendingLoadedPreferences] = useState<SavedExtractionPreferences | null>(null);
+  const [hasHydrated, setHasHydrated] = useState(false);
+  const importJsonInputRef = useRef<HTMLInputElement | null>(null);
 
   const fileSummaries: UploadedFileSummary[] = files.map((file) => ({
     name: file.name,
@@ -106,6 +111,10 @@ export default function HomePage() {
       ...idleLogs
     ]);
   }
+
+  useEffect(() => {
+    setHasHydrated(true);
+  }, []);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(providerSettingsStorageKey);
@@ -272,16 +281,25 @@ export default function HomePage() {
       }))
     );
 
+    const derivedTitle =
+      result.notebookTitle ||
+      deriveNotebookTitle({
+        files: result.files,
+        vocabulary: result.vocabulary
+      });
+
+    if (pendingLoadedPreferences) {
+      setWordRounds(clampRoundCount(pendingLoadedPreferences.wordRounds));
+      setMeaningRounds(clampRoundCount(pendingLoadedPreferences.meaningRounds));
+      setCustomNotebookTitle(pendingLoadedPreferences.notebookTitle.trim() || derivedTitle);
+      setPendingLoadedPreferences(null);
+      return;
+    }
+
     setWordRounds(3);
     setMeaningRounds(3);
-    setCustomNotebookTitle(
-        result.notebookTitle ||
-        deriveNotebookTitle({
-          files: result.files,
-          vocabulary: result.vocabulary
-        })
-    );
-  }, [result]);
+    setCustomNotebookTitle(derivedTitle);
+  }, [pendingLoadedPreferences, result]);
 
   const previewSections = useMemo(
     () => buildMemoryNoteSections(wordRows, meaningRows, wordRounds, meaningRounds),
@@ -328,6 +346,7 @@ export default function HomePage() {
         return response.json() as Promise<ExtractionResponse>;
       })
       .then((data) => {
+        setPendingLoadedPreferences(null);
         setResult(data);
         setFiles([]);
         setProgressValue(0);
@@ -351,6 +370,90 @@ export default function HomePage() {
       .finally(() => {
         setIsLoadingSample(false);
       });
+  }
+
+  function handleDownloadResultJson() {
+    if (!result) {
+      setError("먼저 단어장을 생성하거나 저장된 결과를 불러와주세요.");
+      return;
+    }
+
+    const snapshot: SavedExtractionSnapshot = {
+      format: "english-memory-note-extraction",
+      version: 1,
+      savedAt: new Date().toISOString(),
+      result,
+      preferences: {
+        wordRounds,
+        meaningRounds,
+        notebookTitle:
+          customNotebookTitle.trim() ||
+          result.notebookTitle ||
+          deriveNotebookTitle({
+            files: result.files,
+            vocabulary: result.vocabulary
+          })
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
+      type: "application/json"
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const safeTitle = sanitizeFileName(snapshot.preferences.notebookTitle || "vision-result");
+
+    link.href = url;
+    link.download = `${safeTitle}-vision-result.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    setActivityLogs((current) => [
+      `[결과 저장] Vision 추출 결과 JSON을 다운로드했습니다.`,
+      ...current
+    ]);
+  }
+
+  function handleOpenImportJson() {
+    importJsonInputRef.current?.click();
+  }
+
+  async function handleImportResultJson(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    try {
+      const raw = await file.text();
+      const imported = parseImportedResultJson(raw);
+
+      setError(null);
+      setFiles([]);
+      setPendingLoadedPreferences(imported.preferences);
+      setResult(imported.result);
+      setProgressValue(0);
+      setProgressStage("저장된 결과 불러오기 완료");
+      setProcessedFiles(0);
+      setTotalFiles(imported.result.files.length);
+      setCurrentStep(0);
+      setTotalSteps(0);
+      setActivityLogs([
+        `[결과 불러오기] ${file.name} 파일에서 저장된 결과를 적용했습니다.`,
+        `[재사용] Vision 추출을 다시 실행하지 않고 기존 결과를 복원했습니다.`,
+        ...idleLogs
+      ]);
+    } catch (importError) {
+      setError(
+        importError instanceof Error
+          ? importError.message
+          : "저장된 결과 JSON을 불러오지 못했습니다."
+      );
+    } finally {
+      event.target.value = "";
+    }
   }
 
   async function handleExport(format: "pdf" | "xls") {
@@ -455,6 +558,7 @@ export default function HomePage() {
           <p className="panel-note">이미지를 업로드하면 Vision 모델이 단어와 뜻 목록을 직접 추출합니다.</p>
         </div>
 
+        {hasHydrated ? (
         <form className="upload-form" onSubmit={handleSubmit}>
           <div className="sample-loader">
             <p className="section-label">샘플 불러오기</p>
@@ -531,6 +635,36 @@ export default function HomePage() {
             >
               설정 열기
             </button>
+          </div>
+          <div className="settings-trigger-row">
+            <div className="settings-summary">
+              <p className="section-label">결과 JSON</p>
+              <p>Vision 추출 결과를 JSON으로 저장해두고, 나중에 다시 불러와 재사용할 수 있습니다.</p>
+            </div>
+            <div className="json-actions">
+              <input
+                ref={importJsonInputRef}
+                type="file"
+                accept=".json,application/json"
+                onChange={handleImportResultJson}
+                className="hidden-file-input"
+              />
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={handleOpenImportJson}
+              >
+                저장된 결과 불러오기
+              </button>
+              <button
+                className="secondary-button"
+                type="button"
+                onClick={handleDownloadResultJson}
+                disabled={!result}
+              >
+                결과 JSON 저장
+              </button>
+            </div>
           </div>
           <label className="upload-box" htmlFor="files">
             <span className="upload-title">JPG 또는 PNG 파일 여러 개 선택</span>
@@ -619,6 +753,14 @@ export default function HomePage() {
 
           {error ? <p className="error-text">{error}</p> : null}
         </form>
+        ) : (
+          <div className="upload-form upload-form-placeholder">
+            <div className="sample-loader">
+              <p className="section-label">초기화</p>
+              <p className="empty-text">업로드 화면을 준비하는 중입니다.</p>
+            </div>
+          </div>
+        )}
       </section>
 
       {isSettingsOpen ? (
@@ -1157,4 +1299,153 @@ function compareVocabularyEntries(
   }
 
   return left.word.localeCompare(right.word, "en");
+}
+
+function sanitizeFileName(value: string) {
+  return value
+    .replace(/[\\/:*?"<>|]+/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80) || "vision-result";
+}
+
+function parseImportedResultJson(raw: string): {
+  result: ExtractionResponse;
+  preferences: SavedExtractionPreferences | null;
+} {
+  let parsed: unknown;
+
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new Error("유효한 JSON 파일이 아닙니다.");
+  }
+
+  if (isSavedExtractionSnapshot(parsed)) {
+    return {
+      result: normalizeExtractionResponse(parsed.result),
+      preferences: {
+        wordRounds: clampRoundCount(parsed.preferences.wordRounds),
+        meaningRounds: clampRoundCount(parsed.preferences.meaningRounds),
+        notebookTitle: typeof parsed.preferences.notebookTitle === "string"
+          ? parsed.preferences.notebookTitle
+          : ""
+      }
+    };
+  }
+
+  if (isExtractionResponseLike(parsed)) {
+    return {
+      result: normalizeExtractionResponse(parsed),
+      preferences: null
+    };
+  }
+
+  if (isExpectedResultLike(parsed)) {
+    return {
+      result: {
+        notebookTitle: parsed.case,
+        modeLabel: `Imported (${parsed.case})`,
+        files: parsed.files.map((file) => ({
+          name: file.fileName,
+          size: 0,
+          type: "imported-json"
+        })),
+        vocabulary: parsed.files.flatMap((file) => normalizeVocabularyEntries(file.entries)),
+        warnings: [`저장된 expected 결과에서 불러온 데이터입니다: ${parsed.case}`]
+      },
+      preferences: null
+    };
+  }
+
+  throw new Error("지원하지 않는 결과 JSON 형식입니다.");
+}
+
+function normalizeExtractionResponse(value: ExtractionResponse) {
+  return {
+    notebookTitle: typeof value.notebookTitle === "string" ? value.notebookTitle : undefined,
+    modeLabel: typeof value.modeLabel === "string" ? value.modeLabel : "Imported Result",
+    files: normalizeUploadedFiles(value.files),
+    vocabulary: normalizeVocabularyEntries(value.vocabulary),
+    warnings: Array.isArray(value.warnings)
+      ? value.warnings.filter((warning): warning is string => typeof warning === "string")
+      : []
+  } satisfies ExtractionResponse;
+}
+
+function normalizeUploadedFiles(value: unknown): UploadedFileSummary[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (!isRecord(item) || typeof item.name !== "string") {
+      return [];
+    }
+
+    return [{
+      name: item.name,
+      size: typeof item.size === "number" ? item.size : 0,
+      type: typeof item.type === "string" ? item.type : "unknown"
+    }];
+  });
+}
+
+function normalizeVocabularyEntries(value: unknown): ExtractionResponse["vocabulary"] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((entry) => {
+    if (!isRecord(entry) || typeof entry.word !== "string" || !Array.isArray(entry.senses)) {
+      return [];
+    }
+
+    const senses = entry.senses.flatMap((sense) => {
+      if (!isRecord(sense) || typeof sense.partOfSpeech !== "string" || typeof sense.meaning !== "string") {
+        return [];
+      }
+
+      return [{
+        partOfSpeech: sense.partOfSpeech,
+        meaning: sense.meaning
+      }];
+    });
+
+    return [{
+      sourceNumber: typeof entry.sourceNumber === "number" ? entry.sourceNumber : undefined,
+      word: entry.word,
+      senses
+    }];
+  });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isSavedExtractionSnapshot(value: unknown): value is SavedExtractionSnapshot {
+  return isRecord(value)
+    && value.format === "english-memory-note-extraction"
+    && value.version === 1
+    && isRecord(value.result)
+    && isRecord(value.preferences);
+}
+
+function isExtractionResponseLike(value: unknown): value is ExtractionResponse {
+  return isRecord(value)
+    && Array.isArray(value.vocabulary)
+    && Array.isArray(value.files)
+    && typeof value.modeLabel === "string";
+}
+
+function isExpectedResultLike(value: unknown): value is {
+  case: string;
+  files: Array<{ fileName: string; entries: ExtractionResponse["vocabulary"] }>;
+} {
+  return isRecord(value)
+    && typeof value.case === "string"
+    && Array.isArray(value.files)
+    && value.files.every((file) => isRecord(file) && typeof file.fileName === "string" && Array.isArray(file.entries));
 }
