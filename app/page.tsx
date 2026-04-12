@@ -35,7 +35,7 @@ export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [result, setResult] = useState<ExtractionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<"ocr" | "ocr+ollama" | "ollama-vision">("ocr");
+  const [mode, setMode] = useState<"ocr" | "ocr+ollama" | "ollama-vision">("ollama-vision");
   const [isPending, startTransition] = useTransition();
   const [wordRows, setWordRows] = useState<MemoryNoteRow[]>([]);
   const [meaningRows, setMeaningRows] = useState<MemoryNoteRow[]>([]);
@@ -350,7 +350,7 @@ export default function HomePage() {
     <main className="page-shell">
       <section className="hero-card">
         <p className="eyebrow">영단어 연습노트</p>
-        <h1>이미지 업로드로 암기용 단어장을 만드는 웹 초안</h1>
+        <h1>암기용 단어장 만들기</h1>
         <p className="hero-copy">
           여러 장의 단어 이미지 파일을 업로드하면 단어와 뜻 목록을 정리하고,
           A4 형식의 PDF와 XLS 파일로 내려받을 수 있는 암기 노트를 만들어줍니다.
