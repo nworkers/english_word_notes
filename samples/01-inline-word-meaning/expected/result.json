@@ -1,5 +1,5 @@
 {
-  "case": "01-basic-inline",
+  "case": "01-inline-word-meaning",
   "status": "final",
   "source": "ocr-review",
   "files": [
@@ -10,40 +10,46 @@
           "word": "anger",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "화, 분노" }
-          ]
+          ],
+          "sourceNumber": 1
         },
         {
           "word": "bit",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "(a ~) 조금, 약간" }
-          ]
+          ],
+          "sourceNumber": 2
         },
         {
           "word": "comfort",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "편안함; 위로, 위안" },
             { "partOfSpeech": "동사", "meaning": "위로하다" }
-          ]
+          ],
+          "sourceNumber": 3
         },
         {
           "word": "delight",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "기쁨" },
             { "partOfSpeech": "동사", "meaning": "기쁘게 하다" }
-          ]
+          ],
+          "sourceNumber": 4
         },
         {
           "word": "hunger",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "굶주림, 기아" }
-          ]
+          ],
+          "sourceNumber": 5
         },
         {
           "word": "shock",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "충격" },
             { "partOfSpeech": "동사", "meaning": "충격을 주다" }
-          ]
+          ],
+          "sourceNumber": 6
         },
         {
           "word": "calm",
@@ -51,25 +57,29 @@
             { "partOfSpeech": "명사", "meaning": "침착, 평온" },
             { "partOfSpeech": "형용사", "meaning": "침착한, 평온한" },
             { "partOfSpeech": "동사", "meaning": "진정시키다" }
-          ]
+          ],
+          "sourceNumber": 7
         },
         {
           "word": "appear",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "~인 것 같다[보이다]; 나타나다" }
-          ]
+          ],
+          "sourceNumber": 8
         },
         {
           "word": "disappoint",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "실망시키다" }
-          ]
+          ],
+          "sourceNumber": 9
         },
         {
           "word": "embarrass",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "당황하게 하다" }
-          ]
+          ],
+          "sourceNumber": 10
         }
       ]
     },
@@ -81,62 +91,72 @@
           "senses": [
             { "partOfSpeech": "동사", "meaning": "후회하다, 유감이다" },
             { "partOfSpeech": "명사", "meaning": "후회, 유감" }
-          ]
+          ],
+          "sourceNumber": 11
         },
         {
           "word": "scare",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "겁주다" },
             { "partOfSpeech": "명사", "meaning": "겁, 공포" }
-          ]
+          ],
+          "sourceNumber": 12
         },
         {
           "word": "cheerful",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "발랄한, 쾌활한" }
-          ]
+          ],
+          "sourceNumber": 13
         },
         {
           "word": "confused",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "혼란스러워하는" }
-          ]
+          ],
+          "sourceNumber": 14
         },
         {
           "word": "crazy",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "미친; 화난; 열광적인(about)" }
-          ]
+          ],
+          "sourceNumber": 15
         },
         {
           "word": "curious",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "궁금한, 호기심 많은; 이상한" }
-          ]
+          ],
+          "sourceNumber": 16
         },
         {
           "word": "pleasant",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "즐거운, 쾌적한, 상냥한" }
-          ]
+          ],
+          "sourceNumber": 17
         },
         {
           "word": "silly",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "어리석은; 유치한" }
-          ]
+          ],
+          "sourceNumber": 18
         },
         {
           "word": "sincere",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "진실된[진심의]" }
-          ]
+          ],
+          "sourceNumber": 19
         },
         {
           "word": "satisfied",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "만족하는" }
-          ]
+          ],
+          "sourceNumber": 20
         }
       ]
     },
@@ -147,62 +167,72 @@
           "word": "barber",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "이발사" }
-          ]
+          ],
+          "sourceNumber": 21
         },
         {
           "word": "behavior",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "태도, 행동" }
-          ]
+          ],
+          "sourceNumber": 22
         },
         {
           "word": "boss",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "(직장의) 상사" }
-          ]
+          ],
+          "sourceNumber": 23
         },
         {
           "word": "director",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "임원(이사); 책임자, 감독" }
-          ]
+          ],
+          "sourceNumber": 24
         },
         {
           "word": "engineer",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "엔지니어[기사]" }
-          ]
+          ],
+          "sourceNumber": 25
         },
         {
           "word": "expert",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "전문가" },
             { "partOfSpeech": "형용사", "meaning": "전문가의, 숙련된" }
-          ]
+          ],
+          "sourceNumber": 26
         },
         {
           "word": "personality",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "성격, 개성, 유명인" }
-          ]
+          ],
+          "sourceNumber": 27
         },
         {
           "word": "option",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "선택(권); 선택 과목" }
-          ]
+          ],
+          "sourceNumber": 28
         },
         {
           "word": "position",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "자세; 입장[태도]; 자리, 위치; 직업, 직책" }
-          ]
+          ],
+          "sourceNumber": 29
         },
         {
           "word": "reporter",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "기자, 리포터" }
-          ]
+          ],
+          "sourceNumber": 30
         }
       ]
     },
@@ -213,63 +243,73 @@
           "word": "sailor",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "선원" }
-          ]
+          ],
+          "sourceNumber": 31
         },
         {
           "word": "university",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "대학" }
-          ]
+          ],
+          "sourceNumber": 32
         },
         {
           "word": "worker",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "근로자" }
-          ]
+          ],
+          "sourceNumber": 33
         },
         {
           "word": "offer",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "제안하다; 제공하다" },
             { "partOfSpeech": "명사", "meaning": "제안" }
-          ]
+          ],
+          "sourceNumber": 34
         },
         {
           "word": "remain",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "계속 ~이다; 남다" }
-          ]
+          ],
+          "sourceNumber": 35
         },
         {
           "word": "familiar",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "잘 알고 있는; 친숙한" }
-          ]
+          ],
+          "sourceNumber": 36
         },
         {
           "word": "active",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "활동적인, 적극적인" }
-          ]
+          ],
+          "sourceNumber": 37
         },
         {
           "word": "principal",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "주요한, 주된" },
             { "partOfSpeech": "명사", "meaning": "교장" }
-          ]
+          ],
+          "sourceNumber": 38
         },
         {
           "word": "responsible",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "책임이 있는; 책임감 있는" }
-          ]
+          ],
+          "sourceNumber": 39
         },
         {
           "word": "silent",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "조용한, 침묵을 지키는" }
-          ]
+          ],
+          "sourceNumber": 40
         }
       ]
     },
@@ -280,64 +320,74 @@
           "word": "ability",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "능력[할 수 있음], 기량" }
-          ]
+          ],
+          "sourceNumber": 41
         },
         {
           "word": "aim",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "목표; 조준" },
             { "partOfSpeech": "동사", "meaning": "목표[겨냥]하다" }
-          ]
+          ],
+          "sourceNumber": 42
         },
         {
           "word": "decision",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "결정[판단]" }
-          ]
+          ],
+          "sourceNumber": 43
         },
         {
           "word": "difficulty",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "어려움, 곤란" }
-          ]
+          ],
+          "sourceNumber": 44
         },
         {
           "word": "effort",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "수고, 노력" }
-          ]
+          ],
+          "sourceNumber": 45
         },
         {
           "word": "experience",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "경험" },
             { "partOfSpeech": "동사", "meaning": "경험하다" }
-          ]
+          ],
+          "sourceNumber": 46
         },
         {
           "word": "passion",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "열정" }
-          ]
+          ],
+          "sourceNumber": 47
         },
         {
           "word": "risk",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "위험(요소)" },
             { "partOfSpeech": "동사", "meaning": "위험을 무릅쓰다" }
-          ]
+          ],
+          "sourceNumber": 48
         },
         {
           "word": "vision",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "선견지명[통찰력]; 시력; 상상" }
-          ]
+          ],
+          "sourceNumber": 49
         },
         {
           "word": "youth",
           "senses": [
             { "partOfSpeech": "명사", "meaning": "젊음; 젊은이들[청년층]" }
-          ]
+          ],
+          "sourceNumber": 50
         }
       ]
     },
@@ -348,62 +398,72 @@
           "word": "achieve",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "성취하다, 획득하다" }
-          ]
+          ],
+          "sourceNumber": 51
         },
         {
           "word": "encourage",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "격려하다; 부추기다[장려하다]" }
-          ]
+          ],
+          "sourceNumber": 52
         },
         {
           "word": "focus",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "집중하다[시키다]" },
             { "partOfSpeech": "명사", "meaning": "초점[중심]" }
-          ]
+          ],
+          "sourceNumber": 53
         },
         {
           "word": "overcome",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "극복하다" }
-          ]
+          ],
+          "sourceNumber": 54
         },
         {
           "word": "require",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "필요로 하다, 요구하다" }
-          ]
+          ],
+          "sourceNumber": 55
         },
         {
           "word": "succeed",
           "senses": [
             { "partOfSpeech": "동사", "meaning": "성공하다(in); 뒤를 잇다" }
-          ]
+          ],
+          "sourceNumber": 56
         },
         {
           "word": "challenging",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "도전적인, 힘든" }
-          ]
+          ],
+          "sourceNumber": 57
         },
         {
           "word": "impossible",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "불가능한, 난감한, 참을 수 없는" }
-          ]
+          ],
+          "sourceNumber": 58
         },
         {
           "word": "positive",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "긍정적인, 확신하는" }
-          ]
+          ],
+          "sourceNumber": 59
         },
         {
           "word": "talented",
           "senses": [
             { "partOfSpeech": "형용사", "meaning": "재능 있는, 타고난" }
-          ]
+          ],
+          "sourceNumber": 60
         }
       ]
     }

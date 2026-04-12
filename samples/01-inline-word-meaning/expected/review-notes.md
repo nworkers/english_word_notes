@@ -1,6 +1,6 @@
-# 01-basic-inline Expected Draft Review Notes
+# 01-inline-word-meaning Expected Draft Review Notes
 
-이 문서는 `samples/01-basic-inline/images/`에 있는 샘플을 실제 OCR로 읽은 뒤, `expected/result.draft.json`에 넣은 초안 데이터를 리뷰하기 위한 메모입니다.
+이 문서는 `samples/01-inline-word-meaning/images/`에 있는 샘플을 바탕으로 `expected` 데이터를 리뷰하기 위한 메모입니다.
 
 ## 작업 기준
 

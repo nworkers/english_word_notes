@@ -1,6 +1,6 @@
 # Sample Test Cases
 
-이 디렉토리는 OCR 및 단어-뜻 파싱 품질을 확인하기 위한 샘플 이미지 테스트 케이스를 저장하는 공간입니다. 현재 샘플 데이터는 웹 미리보기뿐 아니라 `PDF` / `XLS` 내보내기 검증의 입력 데이터로도 사용됩니다.
+이 디렉토리는 Vision 기반 단어-뜻 추출 품질을 확인하기 위한 샘플 이미지 테스트 케이스를 저장하는 공간입니다. 현재 샘플 데이터는 웹 미리보기뿐 아니라 `PDF` / `XLS` 내보내기 검증의 입력 데이터로도 사용됩니다.
 
 ## 기본 구조
 
@@ -22,18 +22,10 @@ samples/<case-name>/
 
 ## 케이스 분류
 
-- `01-basic-inline`
-  한 줄 안에 `word : meaning` 형태로 정리된 쉬운 케이스
-- `02-basic-multiline`
-  단어와 뜻이 줄바꿈으로 나뉘어 있는 기본 케이스
-- `03-mixed-layout`
-  이미지 안에 여러 배치 형식이 섞여 있는 케이스
-- `04-low-quality`
-  흐림, 그림자, 낮은 해상도 등 OCR이 어려운 케이스
-- `05-handwritten-notes`
-  손글씨 또는 손글씨가 일부 섞인 케이스
-- `06-edge-cases`
-  특수문자, 중복 단어, 여러 뜻, 불규칙 배치 등 예외 케이스
+- `01-inline-word-meaning`
+  한 줄 안에 `word : meaning` 형태로 정리된 케이스
+- `02-multiline-word-meaning`
+  단어와 뜻이 줄바꿈으로 나뉘어 있는 케이스
 
 ## 기대 결과 파일 예시
 
@@ -41,7 +33,7 @@ samples/<case-name>/
 
 ```json
 {
-  "case": "01-basic-inline",
+  "case": "01-inline-word-meaning",
   "status": "final",
   "source": "sample",
   "files": [

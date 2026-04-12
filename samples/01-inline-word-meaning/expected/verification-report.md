@@ -1,6 +1,6 @@
-# 01-basic-inline Verification Report
+# 01-inline-word-meaning Verification Report
 
-이 문서는 `samples/01-basic-inline/images/` 원본 이미지와 `expected/result.json`을 직접 대조해 검수한 결과입니다.
+이 문서는 `samples/01-inline-word-meaning/images/` 원본 이미지와 `expected/result.json`을 직접 대조해 검수한 결과입니다.
 
 ## 검수 기준
 
@@ -61,6 +61,6 @@
 
 ## 종합 판단
 
-- 현재 `result.json`은 `01-basic-inline` 샘플 이미지와 비교했을 때 의도한 정답셋 기준에 맞게 정리되어 있음
+- 현재 `result.json`은 `01-inline-word-meaning` 샘플 이미지와 비교했을 때 의도한 정답셋 기준에 맞게 정리되어 있음
 - 눈으로 확인한 범위에서 수정이 필요한 불일치는 발견하지 못함
 - 따라서 이 케이스의 확정 기대 결과로 사용 가능함

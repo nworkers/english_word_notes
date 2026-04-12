@@ -1,0 +1,591 @@
+{
+  "case": "02-multiline-word-meaning",
+  "status": "final",
+  "source": "ocr-review",
+  "files": [
+    {
+      "fileName": "KakaoTalk_20260412_203953279_01.jpg",
+      "entries": [
+        {
+          "sourceNumber": 1,
+          "word": "sweep away",
+          "senses": [
+            { "partOfSpeech": "숙어", "meaning": "~을 휩쓸다, 쓸어가다, 휩쓸어 가다, 완전히 없애다" }
+          ]
+        },
+        {
+          "sourceNumber": 2,
+          "word": "insistence",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "주장, 우김, 집요함, 지속, 고집" }
+          ]
+        },
+        {
+          "sourceNumber": 3,
+          "word": "completely",
+          "senses": [
+            { "partOfSpeech": "부사", "meaning": "완전히, 전적으로, 완벽하게, 충분히" }
+          ]
+        },
+        {
+          "sourceNumber": 4,
+          "word": "challenge",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "도전, 어려움" },
+            { "partOfSpeech": "동사", "meaning": "(-하도록) 도전하다" }
+          ]
+        },
+        {
+          "sourceNumber": 5,
+          "word": "soloist",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "독창자, 독주자" }
+          ]
+        },
+        {
+          "sourceNumber": 6,
+          "word": "sign",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "기호, 표시, 간판, 표지판; 징조, 신호, 징후, 조짐" },
+            { "partOfSpeech": "동사", "meaning": "서명하다, 계약하다" }
+          ]
+        },
+        {
+          "sourceNumber": 7,
+          "word": "fill up",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "~을 채우다" }
+          ]
+        },
+        {
+          "sourceNumber": 8,
+          "word": "competitive",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "경쟁의, 경쟁하는, 경쟁적인, 경쟁력 있는, 경쟁심이 강한, 경쟁할 수 있는" }
+          ]
+        },
+        {
+          "sourceNumber": 9,
+          "word": "hydropower",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "수력 전기" }
+          ]
+        },
+        {
+          "sourceNumber": 10,
+          "word": "weekend",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "주말" }
+          ]
+        },
+        {
+          "sourceNumber": 11,
+          "word": "soothe",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "(남의 기분을) 가라앉히다, (마음을) 달래다, 편하게 하다, 완화하다" }
+          ]
+        },
+        {
+          "sourceNumber": 12,
+          "word": "communicate",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "~을 전달하다, 의사소통(을) 하다, 소통하다" }
+          ]
+        },
+        {
+          "sourceNumber": 13,
+          "word": "durable",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "오래가는, 지속되는, 내구력이 있는" }
+          ]
+        },
+        {
+          "sourceNumber": 14,
+          "word": "old fashioned",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "전통적인 사고방식을 지닌, 시대에 뒤떨어진" }
+          ]
+        },
+        {
+          "sourceNumber": 15,
+          "word": "devour",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "(특히 몹시 배가 고파서) 걸신 들린 듯 먹다; 집어삼킬듯이 읽다[보다]" }
+          ]
+        },
+        {
+          "sourceNumber": 16,
+          "word": "dramatize",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "극화하다, 과장하다, 극적으로 만들다" }
+          ]
+        },
+        {
+          "sourceNumber": 17,
+          "word": "arouse",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "자극하다, 깨우다, 야기하다, 환기시키다, 생기다, 불러일으키다, 자아내다" }
+          ]
+        },
+        {
+          "sourceNumber": 18,
+          "word": "burned out",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "기진맥진한, 지친" }
+          ]
+        },
+        {
+          "sourceNumber": 19,
+          "word": "violation",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "위반, 위배" }
+          ]
+        },
+        {
+          "sourceNumber": 20,
+          "word": "eventually",
+          "senses": [
+            { "partOfSpeech": "부사", "meaning": "마침내, 결국엔, 드디어, 언젠가는, 결국, 궁극적으로" }
+          ]
+        },
+        {
+          "sourceNumber": 21,
+          "word": "in terms of",
+          "senses": [
+            { "partOfSpeech": "숙어", "meaning": "~의 면에서, 관하여, ~의 견지[관점]에서" }
+          ]
+        },
+        {
+          "sourceNumber": 22,
+          "word": "inclined",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "선호하는, 경향이 있는" }
+          ]
+        },
+        {
+          "sourceNumber": 23,
+          "word": "hamper",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "방해가 되다" },
+            { "partOfSpeech": "명사", "meaning": "바구니" }
+          ]
+        },
+        {
+          "sourceNumber": 24,
+          "word": "suspend",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "~을 매달다, 걸다; 유예하다, (특권 등을) 일시 정지하다; 정학시키다" }
+          ]
+        },
+        {
+          "sourceNumber": 25,
+          "word": "inherit",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "물려받다, 유전하다, 상속받다" }
+          ]
+        },
+        {
+          "sourceNumber": 26,
+          "word": "get over",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "극복하다, 이겨내다" }
+          ]
+        },
+        {
+          "sourceNumber": 27,
+          "word": "surrounding",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "인근의, 주위의, 둘러싸는" },
+            { "partOfSpeech": "명사", "meaning": "환경" }
+          ]
+        },
+        {
+          "sourceNumber": 28,
+          "word": "time after time",
+          "senses": [
+            { "partOfSpeech": "숙어", "meaning": "되풀이하여" }
+          ]
+        },
+        {
+          "sourceNumber": 29,
+          "word": "grand",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "웅장한, 웅대한, 의리의리한" }
+          ]
+        },
+        {
+          "sourceNumber": 30,
+          "word": "indispensable",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "필수의, 불가결의, 긴요한, 없어서는 안 될" }
+          ]
+        },
+        {
+          "sourceNumber": 31,
+          "word": "primitive",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "원시의, 원시적인, 원시 사회의, 초기의, 태고의" }
+          ]
+        },
+        {
+          "sourceNumber": 32,
+          "word": "the 4th of July",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "(미국의) 독립 기념일" }
+          ]
+        },
+        {
+          "sourceNumber": 33,
+          "word": "barrier",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "장벽, 보호, 방벽, 방책, 장애(물)" }
+          ]
+        },
+        {
+          "sourceNumber": 34,
+          "word": "entertainment",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "환대, 오락, 연예" }
+          ]
+        },
+        {
+          "sourceNumber": 35,
+          "word": "savage",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "야만적인, 미개한, 사나운, 잔인한, 흉포한" },
+            { "partOfSpeech": "명사", "meaning": "야만인" }
+          ]
+        },
+        {
+          "sourceNumber": 36,
+          "word": "insist on",
+          "senses": [
+            { "partOfSpeech": "숙어", "meaning": "~을 (강력히) 요구하다, ~을 고집하다" }
+          ]
+        },
+        {
+          "sourceNumber": 37,
+          "word": "pupil",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "학생, 제자; 동공, 눈동자" }
+          ]
+        },
+        {
+          "sourceNumber": 38,
+          "word": "feat",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "위업, 공적, 묘기, 재주" }
+          ]
+        },
+        {
+          "sourceNumber": 39,
+          "word": "jump rope",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "줄넘기를 하다" },
+            { "partOfSpeech": "명사", "meaning": "줄넘기" }
+          ]
+        },
+        {
+          "sourceNumber": 40,
+          "word": "consumption",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "소비, 소모(량); 섭취; 몰두, 사로잡힘" }
+          ]
+        },
+        {
+          "sourceNumber": 41,
+          "word": "application",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "지원(서), 신청서; 응용, 적용" }
+          ]
+        },
+        {
+          "sourceNumber": 42,
+          "word": "get to",
+          "senses": [
+            { "partOfSpeech": "숙어", "meaning": "~에 도착하다, 착수하다, 시작하다" }
+          ]
+        },
+        {
+          "sourceNumber": 43,
+          "word": "genuine",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "진짜의, 진품의; 진실한, 진심 어린" }
+          ]
+        },
+        {
+          "sourceNumber": 44,
+          "word": "stick to",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "(-에) 달라붙다; 지키다, 고수하다" }
+          ]
+        },
+        {
+          "sourceNumber": 45,
+          "word": "as soon as",
+          "senses": [
+            { "partOfSpeech": "숙어", "meaning": "~하자마자" }
+          ]
+        },
+        {
+          "sourceNumber": 46,
+          "word": "entry",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "입장, 들어감, 출입, 등장; 등록, 기재 사항; 출품작, 참가작; 참가, 가입" }
+          ]
+        },
+        {
+          "sourceNumber": 47,
+          "word": "gift certificate",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "상품권" }
+          ]
+        },
+        {
+          "sourceNumber": 48,
+          "word": "competition",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "경쟁; (경연) 대회, 시합; 경쟁자, 경쟁 상대" }
+          ]
+        },
+        {
+          "sourceNumber": 49,
+          "word": "bully",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "(집단으로) 괴롭히다, 못살게 굴다" },
+            { "partOfSpeech": "명사", "meaning": "(약자를) 괴롭히는 사람" }
+          ]
+        },
+        {
+          "sourceNumber": 50,
+          "word": "photovoltaic",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "광발전, 물리의" }
+          ]
+        }
+      ]
+    },
+    {
+      "fileName": "KakaoTalk_20260412_203953279.jpg",
+      "entries": [
+        {
+          "sourceNumber": 51,
+          "word": "flame",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "불꽃, 불길, 화염" },
+            { "partOfSpeech": "동사", "meaning": "불타오르다" }
+          ]
+        },
+        {
+          "sourceNumber": 52,
+          "word": "bother",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "신경 쓰이게 하다, (-을) 괴롭히다, 귀찮게 하다, 성가시게 하다" }
+          ]
+        },
+        {
+          "sourceNumber": 53,
+          "word": "row",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "노를 젓다" },
+            { "partOfSpeech": "명사", "meaning": "열, 줄; 분란; 노젓기" }
+          ]
+        },
+        {
+          "sourceNumber": 54,
+          "word": "outlet",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "(배)출구, 배수구, 발산[배출] 수단, 콘센트; (상품의) 판로, 소매점" }
+          ]
+        },
+        {
+          "sourceNumber": 55,
+          "word": "desolate",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "적막한, 너무나 외로운, 황량한, 황폐한, 고독한" }
+          ]
+        },
+        {
+          "sourceNumber": 56,
+          "word": "submit",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "제출하다; 항복[굴복]하다, 복종하다" }
+          ]
+        },
+        {
+          "sourceNumber": 57,
+          "word": "referee",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "(스포츠 경기의) 심판" }
+          ]
+        },
+        {
+          "sourceNumber": 58,
+          "word": "on the spot",
+          "senses": [
+            { "partOfSpeech": "부사", "meaning": "즉석에서, 현장에서, 즉각, 그 자리에서, 당장" }
+          ]
+        },
+        {
+          "sourceNumber": 59,
+          "word": "overfeed",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "너무 많은 음식을 주다" }
+          ]
+        },
+        {
+          "sourceNumber": 60,
+          "word": "renewable",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "재생 가능한, 갱신 가능한" }
+          ]
+        },
+        {
+          "sourceNumber": 61,
+          "word": "boost",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "끌어올리다" },
+            { "partOfSpeech": "명사", "meaning": "격려, 후원" }
+          ]
+        },
+        {
+          "sourceNumber": 62,
+          "word": "by oneself",
+          "senses": [
+            { "partOfSpeech": "숙어", "meaning": "혼자, 단독으로, 홀로, 스스로" }
+          ]
+        },
+        {
+          "sourceNumber": 63,
+          "word": "vigorous",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "원기 왕성한, 활기찬, 활발한, 정력적인, 기운찬, 격렬한, 강력한" }
+          ]
+        },
+        {
+          "sourceNumber": 64,
+          "word": "get along with",
+          "senses": [
+            { "partOfSpeech": "숙어", "meaning": "~와 사이 좋게 지내다, ~와 잘 어울리다" }
+          ]
+        },
+        {
+          "sourceNumber": 65,
+          "word": "straw",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "지푸라기, 짚, 밀짚, 빨대" }
+          ]
+        },
+        {
+          "sourceNumber": 66,
+          "word": "mainstream",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "(활동·사상 등의) 주류" },
+            { "partOfSpeech": "동사", "meaning": "(특정한 사상, 견해를) 주류에 편입시키다" },
+            { "partOfSpeech": "형용사", "meaning": "주류의" }
+          ]
+        },
+        {
+          "sourceNumber": 67,
+          "word": "ensemble",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "앙상블, 합주단" }
+          ]
+        },
+        {
+          "sourceNumber": 68,
+          "word": "underfeed",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "충분한 음식을 주지 않다" }
+          ]
+        },
+        {
+          "sourceNumber": 69,
+          "word": "trivial",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "하찮은, 사소한" }
+          ]
+        },
+        {
+          "sourceNumber": 70,
+          "word": "endurance",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "인내, 끈기, 지구력" }
+          ]
+        },
+        {
+          "sourceNumber": 71,
+          "word": "immature",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "미숙한" }
+          ]
+        },
+        {
+          "sourceNumber": 72,
+          "word": "announce",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "발표하다, 알리다; 방송하다; 선언하다" }
+          ]
+        },
+        {
+          "sourceNumber": 73,
+          "word": "instrument",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "수단, 도구, 기구; 악기" }
+          ]
+        },
+        {
+          "sourceNumber": 74,
+          "word": "expedition",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "탐험(대), 원정(대)" }
+          ]
+        },
+        {
+          "sourceNumber": 75,
+          "word": "distinctive",
+          "senses": [
+            { "partOfSpeech": "형용사", "meaning": "독특한, 두드러진, 특징적인" }
+          ]
+        },
+        {
+          "sourceNumber": 76,
+          "word": "task",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "(힘든) 일, 직무, 과제" },
+            { "partOfSpeech": "동사", "meaning": "과제를 맡기다" }
+          ]
+        },
+        {
+          "sourceNumber": 77,
+          "word": "iris",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "(눈의) 홍채" }
+          ]
+        },
+        {
+          "sourceNumber": 78,
+          "word": "motion",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "운동, 움직임, 동작" },
+            { "partOfSpeech": "동사", "meaning": "몸짓을 하다" }
+          ]
+        },
+        {
+          "sourceNumber": 79,
+          "word": "cornerstone",
+          "senses": [
+            { "partOfSpeech": "명사", "meaning": "초석, 토대, 주춧돌" }
+          ]
+        },
+        {
+          "sourceNumber": 80,
+          "word": "back off",
+          "senses": [
+            { "partOfSpeech": "동사", "meaning": "물러서다" }
+          ]
+        }
+      ]
+    }
+  ]
+}

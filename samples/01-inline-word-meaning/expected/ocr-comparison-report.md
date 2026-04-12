@@ -1,6 +1,6 @@
 # OCR Comparison Report
 
-- Case: `01-basic-inline`
+- Case: `01-inline-word-meaning`
 - Generated at: `2026-04-12T04:08:45.639Z`
 - Mode: `Ollama Vision`
 - Files: 6
@@ -278,4 +278,3 @@ Model output preview:
         {
           "partOfSpeech": "명사
 ```
-
