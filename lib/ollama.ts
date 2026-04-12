@@ -1,4 +1,5 @@
 import type { ExtractionResponse, ProviderSettings, VocabularyEntry, VocabularySense } from "./types";
+import { normalizeVocabularyNumbering, sanitizeSourceNumber } from "./vocabulary-numbering";
 
 type OllamaChatResponse = {
   message?: {
@@ -23,7 +24,7 @@ type OllamaProgressCallbacks = {
 const DEFAULT_OLLAMA_BASE_URL = "http://127.0.0.1:11434";
 const DEFAULT_OLLAMA_MODEL = "gemma4:e4b";
 const DEFAULT_OLLAMA_VISION_MODEL = "qwen3.5:9b";
-const DEFAULT_OLLAMA_TIMEOUT_MS = 120_000;
+const DEFAULT_OLLAMA_TIMEOUT_MS = 300_000;
 const DEFAULT_OLLAMA_VISION_MAX_WIDTH = 1024;
 const DEFAULT_OLLAMA_VISION_QUALITY = 4;
 
@@ -50,9 +51,7 @@ export async function postProcessWithOllama(
   const chatUrl = buildOllamaUrl(baseUrl, "/chat");
   const response = await fetchWithTimeout(chatUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: buildOllamaHeaders(resolved.apiKey),
     body: JSON.stringify({
       model,
       stream: false,
@@ -80,9 +79,20 @@ export async function postProcessWithOllama(
     currentStep: 4
   });
   const parsed = parseOllamaJson(content, allowedWords, ocrText);
+  const sourceNumberByWord = new Map(
+    extraction.vocabulary.map((entry) => [entry.word.toLowerCase(), entry.sourceNumber])
+  );
 
   return {
-    vocabulary: parsed.vocabulary,
+    vocabulary: normalizeVocabularyNumbering(
+      parsed.vocabulary.map((entry) => ({
+        ...entry,
+        sourceNumber: (
+          sanitizeSourceNumber(entry.sourceNumber) ??
+          sanitizeSourceNumber(sourceNumberByWord.get(entry.word.toLowerCase()))
+        ) ?? undefined
+      }))
+    ),
     warnings: parsed.warnings
   };
 }
@@ -99,7 +109,17 @@ export async function extractWithOllamaVision(
   const resolved = resolveOllamaSettings(settings);
   const baseUrl = resolved.baseUrl;
   const model = resolved.visionModel;
+  const timeoutMs = getOllamaTimeoutMs(settings);
   const chatUrl = buildOllamaUrl(baseUrl, "/chat");
+  callbacks?.onProgress?.(
+    14,
+    "비전 준비",
+    `Ollama Vision 요청 정보: baseUrl=${baseUrl}, model=${model}, timeout=${timeoutMs}ms`,
+    {
+      currentStep: 1,
+      processedFiles: 0
+    }
+  );
   const prepared = await prepareVisionFiles(files, settings);
   callbacks?.onProgress?.(35, "비전 준비", "Vision 입력 이미지를 인코딩하고 있습니다.", {
     currentStep: 2,
@@ -112,9 +132,7 @@ export async function extractWithOllamaVision(
   });
   const response = await fetchWithTimeout(chatUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: buildOllamaHeaders(resolved.apiKey),
     body: JSON.stringify({
       model,
       stream: false,
@@ -139,7 +157,11 @@ export async function extractWithOllamaVision(
   }, settings);
 
   if (!response.ok) {
-    throw new Error(`Ollama Vision API 호출 실패: ${response.status} ${response.statusText}`);
+    const body = await response.text().catch(() => "");
+    const bodyHint = body.trim() ? ` / 응답: ${body.trim().slice(0, 400)}` : "";
+    throw new Error(
+      `Ollama Vision API 호출 실패: ${response.status} ${response.statusText} / baseUrl=${baseUrl} / model=${model}${bodyHint}`
+    );
   }
 
   const payload = (await response.json()) as { message?: { content?: string } };
@@ -160,7 +182,7 @@ export async function extractWithOllamaVision(
     });
     const parsed = parseOllamaJson(content, new Set(), "");
     return {
-      vocabulary: parsed.vocabulary,
+      vocabulary: normalizeVocabularyNumbering(parsed.vocabulary),
       warnings: [...parsed.warnings, ...prepared.warnings],
       rawText: content
     };
@@ -187,11 +209,10 @@ async function postProcessWithGenerate(
   const ocrText = extraction.rawTexts.map((item) => item.text).join("\n");
   const generateUrl = buildOllamaUrl(baseUrl, "/generate");
   const prompt = buildGeneratePrompt(extraction);
+  const resolved = resolveOllamaSettings(settings);
   const response = await fetchWithTimeout(generateUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: buildOllamaHeaders(resolved.apiKey),
     body: JSON.stringify({
       model,
       stream: false,
@@ -214,7 +235,7 @@ async function postProcessWithGenerate(
   const parsed = parseOllamaJson(content, allowedWords, ocrText);
 
   return {
-    vocabulary: parsed.vocabulary,
+    vocabulary: normalizeVocabularyNumbering(parsed.vocabulary),
     warnings: parsed.warnings
   };
 }
@@ -239,6 +260,7 @@ function buildMessages(extraction: ExtractionResponse) {
       output_schema: {
         vocabulary: [
           {
+            source_number: "number|null",
             word: "string",
             senses: [{ partOfSpeech: "명사|동사|형용사|부사", meaning: "string" }]
           }
@@ -246,10 +268,12 @@ function buildMessages(extraction: ExtractionResponse) {
         warnings: ["string"]
       },
       rules: [
-        "표제어만 남긴다.",
-        "파생어, 유의어, 예문, 숙어는 제외한다.",
+        "단어 영역의 표제어는 보존한다.",
+        "파생어, 유의어, 예문, 숙어 제거 규칙은 뜻 영역에만 적용한다.",
         "뜻은 품사별로 분리한다.",
-        "OCR 결과를 근거로 보수적으로 추출한다."
+        "OCR 결과를 근거로 보수적으로 추출한다.",
+        "원본에 번호가 있으면 source_number 로 유지한다.",
+        "챕터가 바뀌어 번호가 다시 시작해도 원래 순서를 유지한다."
       ],
       ocr_mode_label: extraction.modeLabel,
       whitelist_words: extraction.vocabulary.map((entry) => entry.word).sort(),
@@ -304,6 +328,7 @@ function buildVisionUserPrompt() {
       output_schema: {
         vocabulary: [
           {
+            source_number: "number|null",
             word: "string",
             senses: [{ partOfSpeech: "명사|동사|형용사|부사", meaning: "string" }]
           }
@@ -311,10 +336,12 @@ function buildVisionUserPrompt() {
         warnings: ["string"]
       },
       rules: [
-        "표제어만 남긴다.",
-        "파생어, 유의어, 예문, 숙어는 제외한다.",
+        "단어 영역의 표제어는 보존한다.",
+        "파생어, 유의어, 예문, 숙어 제거 규칙은 뜻 영역에만 적용한다.",
         "뜻은 품사별로 분리한다.",
-        "이미지에 보이는 항목만 추출한다."
+        "이미지에 보이는 항목만 추출한다.",
+        "문항 번호가 보이면 source_number 에 넣는다.",
+        "챕터가 바뀌어 번호가 다시 시작해도 원래 순서를 유지한다."
       ]
     },
     null,
@@ -471,6 +498,7 @@ function normalizeEntry(
   }
 
   const candidate = value as {
+    source_number?: unknown;
     word?: unknown;
     senses?: unknown;
   };
@@ -493,6 +521,7 @@ function normalizeEntry(
   }
 
   return {
+    sourceNumber: sanitizeSourceNumber(candidate.source_number) ?? undefined,
     word,
     senses
   };
@@ -539,6 +568,18 @@ function buildOllamaUrl(baseUrl: string, path: string) {
   }
 
   return `${trimmed}/api${path}`;
+}
+
+function buildOllamaHeaders(apiKey?: string) {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json"
+  };
+
+  if (apiKey) {
+    headers.Authorization = `Bearer ${apiKey}`;
+  }
+
+  return headers;
 }
 
 function getOllamaVisionMaxWidth(settings?: Partial<ProviderSettings>) {
@@ -655,13 +696,26 @@ async function fetchWithTimeout(
   settings?: Partial<ProviderSettings>
 ) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), getOllamaTimeoutMs(settings));
+  const timeoutMs = getOllamaTimeoutMs(settings);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     return await fetch(input, {
       ...init,
       signal: controller.signal
     });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error(
+        `Ollama 요청이 중단되었습니다. timeout=${timeoutMs}ms 안에 응답이 오지 않았거나 연결이 끊어졌습니다. url=${input}`
+      );
+    }
+
+    if (error instanceof TypeError) {
+      throw new Error(`Ollama 서버 연결 실패: ${error.message} / url=${input}`);
+    }
+
+    throw error;
   } finally {
     clearTimeout(timeout);
   }
@@ -685,9 +739,7 @@ export async function debugOllamaVision(imagePath: string) {
 
   const response = await fetchWithTimeout(chatUrl, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: buildOllamaHeaders(process.env.OLLAMA_API_KEY),
     body: JSON.stringify({
       model,
       stream: false,
@@ -726,6 +778,7 @@ function resolveOllamaSettings(settings?: Partial<ProviderSettings>) {
   return {
     baseUrl:
       settings?.ollamaBaseUrl?.trim() || process.env.OLLAMA_BASE_URL || DEFAULT_OLLAMA_BASE_URL,
+    apiKey: settings?.ollamaApiKey?.trim() || process.env.OLLAMA_API_KEY || "",
     model: settings?.ollamaModel?.trim() || process.env.OLLAMA_MODEL || DEFAULT_OLLAMA_MODEL,
     visionModel:
       settings?.ollamaVisionModel?.trim() ||

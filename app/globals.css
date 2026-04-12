@@ -536,24 +536,6 @@ input {
   gap: 12px;
 }
 
-.sense-list {
-  margin: 8px 0 0;
-  padding-left: 18px;
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-.sense-list li {
-  margin: 0;
-}
-
-.sense-pos {
-  display: inline-block;
-  min-width: 3.8rem;
-  color: var(--accent-dark);
-  font-weight: 700;
-}
-
 .raw-text-item {
   padding: 14px 16px;
   border: 1px solid rgba(139, 71, 24, 0.14);
@@ -573,6 +555,38 @@ input {
   color: var(--muted);
   font-family: "Courier New", monospace;
   line-height: 1.6;
+}
+
+.answer-key-table {
+  display: grid;
+  border: 1px solid rgba(139, 71, 24, 0.14);
+  border-radius: 16px;
+  overflow: hidden;
+  background: white;
+}
+
+.answer-key-row {
+  display: grid;
+  grid-template-columns: 72px minmax(140px, 0.9fr) minmax(0, 1.6fr);
+}
+
+.answer-key-row + .answer-key-row {
+  border-top: 1px solid rgba(139, 71, 24, 0.12);
+}
+
+.answer-key-row > div {
+  padding: 12px 14px;
+  border-right: 1px solid rgba(139, 71, 24, 0.12);
+  line-height: 1.6;
+}
+
+.answer-key-row > div:last-child {
+  border-right: 0;
+}
+
+.answer-key-header {
+  background: rgba(139, 71, 24, 0.06);
+  font-weight: 700;
 }
 
 .note-section + .note-section {

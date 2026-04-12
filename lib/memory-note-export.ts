@@ -56,7 +56,7 @@ export function buildWorkbookXml(payload: MemoryNoteExportPayload) {
     columns: ["번호", "단어", "뜻"],
     widths: [42, 120, 295],
     rows: payload.vocabulary.map((entry, index) => [
-      String(index + 1),
+      String(entry.sourceNumber ?? index + 1),
       entry.word,
       entry.senses.map((sense) => `${sense.partOfSpeech}: ${sense.meaning}`).join(" / ")
     ])
@@ -565,7 +565,6 @@ async function appendAnswerKeyPages(
     });
 
     for (const [rowIndex, entry] of pageEntries.entries()) {
-      const absoluteIndex = pageIndex * MEMORY_NOTE_ROWS_PER_PAGE + rowIndex + 1;
       const rowTopY = topY - headerHeight - dividerGap - rowIndex * (rowHeight + dividerGap);
       const rowBottomY = rowTopY - rowHeight;
       const textY = rowBottomY + 7;
@@ -579,7 +578,7 @@ async function appendAnswerKeyPages(
         });
       }
 
-      await drawTextLine(page, textRenderer, String(absoluteIndex), {
+      await drawTextLine(page, textRenderer, String(entry.sourceNumber ?? pageIndex * MEMORY_NOTE_ROWS_PER_PAGE + rowIndex + 1), {
         x: numberX + 8,
         y: textY,
         size: 7.2,

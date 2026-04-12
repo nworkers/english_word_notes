@@ -1,4 +1,5 @@
 import type { ExtractionResponse, ProviderSettings, VocabularyEntry, VocabularySense } from "./types";
+import { normalizeVocabularyNumbering, sanitizeSourceNumber } from "./vocabulary-numbering";
 
 type OpenAIResponse = {
   output_text?: string;
@@ -88,8 +89,19 @@ export async function postProcessWithOpenAI(
   });
 
   const parsed = parseModelJson(content, allowedWords, ocrText);
+  const sourceNumberByWord = new Map(
+    extraction.vocabulary.map((entry) => [entry.word.toLowerCase(), entry.sourceNumber])
+  );
   return {
-    vocabulary: parsed.vocabulary,
+    vocabulary: normalizeVocabularyNumbering(
+      parsed.vocabulary.map((entry) => ({
+        ...entry,
+        sourceNumber: (
+          sanitizeSourceNumber(entry.sourceNumber) ??
+          sanitizeSourceNumber(sourceNumberByWord.get(entry.word.toLowerCase()))
+        ) ?? undefined
+      }))
+    ),
     warnings: parsed.warnings
   };
 }
@@ -177,7 +189,7 @@ export async function extractWithOpenAIVision(
   try {
     const parsed = parseModelJson(content, new Set(), "");
     return {
-      vocabulary: parsed.vocabulary,
+      vocabulary: normalizeVocabularyNumbering(parsed.vocabulary),
       warnings: parsed.warnings,
       rawText: content
     };
@@ -265,12 +277,17 @@ function buildOpenAITextPrompt(extraction: ExtractionResponse) {
         "If a meaning clearly belongs to multiple parts of speech, split into separate senses.",
         "Do not invent words that are not supported by the OCR text.",
         "Only output words that exist in the provided whitelist.",
-        "Meanings must be copied exactly from the OCR text, not paraphrased."
+        "Meanings must be copied exactly from the OCR text, not paraphrased.",
+        "Never remove or alter the headword shown in the word column.",
+        "Exclusion rules for derivatives, synonyms, phrases, and examples apply only to the meaning side.",
+        "If the source material includes printed item numbers, preserve them in source_number.",
+        "If numbering restarts by chapter, keep the printed number in source_number and preserve the original order."
       ].join(" "),
       task: "ocr_vocabulary_structuring",
       output_schema: {
         vocabulary: [
           {
+            source_number: "number|null",
             word: "string",
             senses: [{ partOfSpeech: "명사|동사|형용사|부사", meaning: "string" }]
           }
@@ -294,14 +311,18 @@ function buildOpenAIVisionPrompt() {
         "응답은 반드시 JSON 객체만 출력한다.",
         "코드 블록, 설명 문구를 포함하지 않는다.",
         "Extract only headwords and their Korean meanings.",
-        "Exclude derivatives, synonyms, phrases, example sentences, and related expressions.",
+        "Exclude derivatives, synonyms, phrases, example sentences, and related expressions only from the meaning side.",
         "Use Korean part-of-speech labels only: 명사, 동사, 형용사, 부사.",
         "Do not invent words not explicitly shown in the images.",
-        "Preserve the wording of meanings exactly as seen."
+        "Preserve the wording of meanings exactly as seen.",
+        "Never remove or alter the headword shown in the word column.",
+        "If printed item numbers are visible, include them as source_number.",
+        "If numbering restarts in a later chapter, keep the printed number and preserve the original order."
       ],
       output_schema: {
         vocabulary: [
           {
+            source_number: "number|null",
             word: "string",
             senses: [{ partOfSpeech: "명사|동사|형용사|부사", meaning: "string" }]
           }
@@ -366,6 +387,7 @@ function normalizeVocabularyEntry(input: unknown): VocabularyEntry | null {
   }
 
   const candidate = input as {
+    source_number?: unknown;
     word?: unknown;
     senses?: unknown;
   };
@@ -390,6 +412,7 @@ function normalizeVocabularyEntry(input: unknown): VocabularyEntry | null {
   }
 
   return {
+    sourceNumber: sanitizeSourceNumber(candidate.source_number) ?? undefined,
     word,
     senses: dedupeSenses(senses)
   };

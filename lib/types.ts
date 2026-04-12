@@ -10,6 +10,7 @@ export type VocabularySense = {
 };
 
 export type VocabularyEntry = {
+  sourceNumber?: number;
   word: string;
   senses: VocabularySense[];
 };
@@ -49,6 +50,7 @@ export type MemoryNoteExportPayload = {
 
 export type ProviderSettings = {
   ollamaBaseUrl: string;
+  ollamaApiKey: string;
   ollamaModel: string;
   ollamaVisionModel: string;
   ollamaTimeoutMs: number;

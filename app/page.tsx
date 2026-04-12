@@ -21,9 +21,10 @@ const idleLogs = ["[준비됨] 이미지를 선택하고 단어장 생성을 누
 const providerSettingsStorageKey = "english-memory-note-maker.provider-settings";
 const defaultProviderSettings: ProviderSettings = {
   ollamaBaseUrl: "http://127.0.0.1:11434",
+  ollamaApiKey: "",
   ollamaModel: "gemma4:e4b",
   ollamaVisionModel: "qwen3.5:9b",
-  ollamaTimeoutMs: 120000,
+  ollamaTimeoutMs: 300000,
   ollamaVisionMaxWidth: 1024,
   ollamaVisionQuality: 4,
   geminiApiKey: "",
@@ -258,16 +259,18 @@ export default function HomePage() {
     const shuffledMeanings = shuffleEntries(result.vocabulary);
 
     setWordRows(
-      shuffledWords.map((entry) => ({
-        sourceNumber: result.vocabulary.indexOf(entry) + 1,
+      shuffledWords.map((entry, index) => ({
+        sourceNumber:
+          entry.sourceNumber ?? (result.vocabulary.indexOf(entry) >= 0 ? result.vocabulary.indexOf(entry) + 1 : index + 1),
         prompt: entry.word,
         answerLabel: "뜻"
       }))
     );
 
     setMeaningRows(
-      shuffledMeanings.map((entry) => ({
-        sourceNumber: result.vocabulary.indexOf(entry) + 1,
+      shuffledMeanings.map((entry, index) => ({
+        sourceNumber:
+          entry.sourceNumber ?? (result.vocabulary.indexOf(entry) >= 0 ? result.vocabulary.indexOf(entry) + 1 : index + 1),
         prompt: formatMeaningPrompt(entry),
         answerLabel: "단어"
       }))
@@ -696,6 +699,19 @@ export default function HomePage() {
                 <section className="settings-card">
                   <h3>Ollama</h3>
                   <label className="settings-field">
+                    <span>API Key</span>
+                    <input
+                      type="password"
+                      value={providerSettings.ollamaApiKey}
+                      onChange={(event) =>
+                        setProviderSettings((current) => ({
+                          ...current,
+                          ollamaApiKey: event.target.value
+                        }))
+                      }
+                    />
+                  </label>
+                  <label className="settings-field">
                     <span>Base URL</span>
                     <input
                       type="text"
@@ -751,6 +767,10 @@ export default function HomePage() {
                       }
                     />
                   </label>
+                  <p className="settings-note">
+                    로컬은 Base URL만으로 사용할 수 있고, Ollama Cloud는 `https://ollama.com/api`
+                    와 API Key를 함께 입력하면 됩니다.
+                  </p>
                 </section>
 
                 <section className="settings-card">
@@ -977,7 +997,8 @@ export default function HomePage() {
                 rows={section.rows}
               />
             ))}
-            <ExtractedVocabularySection result={result} />
+            <AnswerKeySection result={result} />
+            <StructuredJsonSection result={result} />
             <RawTextSection result={result} />
           </>
         ) : (
@@ -1021,27 +1042,57 @@ function ResultSummary({
   );
 }
 
-function ExtractedVocabularySection({ result }: { result: ExtractionResponse }) {
+function StructuredJsonSection({ result }: { result: ExtractionResponse }) {
+  const sortedVocabulary = [...result.vocabulary].sort(compareVocabularyEntries);
+  const formattedJson = JSON.stringify(
+    {
+      vocabulary: sortedVocabulary.map((entry, index) => ({
+        sourceNumber: entry.sourceNumber ?? index + 1,
+        word: entry.word,
+        senses: entry.senses
+      }))
+    },
+    null,
+    2
+  );
+
   return (
     <section className="raw-text-card non-print">
       <div className="note-header">
         <h3>구조화된 추출 결과</h3>
-        <p>현재 OCR 추출 결과를 `word + senses[]` 형식으로 표시합니다.</p>
+        <p>번호순으로 정렬된 JSON 출력입니다.</p>
       </div>
 
-      <div className="raw-text-list">
-        {result.vocabulary.map((entry) => (
-          <article className="raw-text-item" key={entry.word}>
-            <strong>{entry.word}</strong>
-            <ul className="sense-list">
-              {entry.senses.map((sense) => (
-                <li key={`${entry.word}-${sense.partOfSpeech}-${sense.meaning}`}>
-                  <span className="sense-pos">{sense.partOfSpeech}</span>
-                  <span>{sense.meaning}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
+      <article className="raw-text-item">
+        <strong>structured-result.json</strong>
+        <pre>{formattedJson}</pre>
+      </article>
+    </section>
+  );
+}
+
+function AnswerKeySection({ result }: { result: ExtractionResponse }) {
+  const sortedVocabulary = [...result.vocabulary].sort(compareVocabularyEntries);
+
+  return (
+    <section className="raw-text-card non-print">
+      <div className="note-header">
+        <h3>정답지</h3>
+        <p>번호순으로 정렬된 정답 목록입니다.</p>
+      </div>
+
+      <div className="answer-key-table">
+        <div className="answer-key-row answer-key-header">
+          <div>번호</div>
+          <div>단어</div>
+          <div>뜻</div>
+        </div>
+        {sortedVocabulary.map((entry, index) => (
+          <div className="answer-key-row" key={`${entry.sourceNumber ?? index + 1}-${entry.word}`}>
+            <div>{entry.sourceNumber ?? index + 1}</div>
+            <div>{entry.word}</div>
+            <div>{entry.senses.map((sense) => `${sense.partOfSpeech}: ${sense.meaning}`).join(" / ")}</div>
+          </div>
         ))}
       </div>
     </section>
@@ -1159,4 +1210,18 @@ function delay(ms: number) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
   });
+}
+
+function compareVocabularyEntries(
+  left: ExtractionResponse["vocabulary"][number],
+  right: ExtractionResponse["vocabulary"][number]
+) {
+  const leftNumber = left.sourceNumber ?? Number.MAX_SAFE_INTEGER;
+  const rightNumber = right.sourceNumber ?? Number.MAX_SAFE_INTEGER;
+
+  if (leftNumber !== rightNumber) {
+    return leftNumber - rightNumber;
+  }
+
+  return left.word.localeCompare(right.word, "en");
 }

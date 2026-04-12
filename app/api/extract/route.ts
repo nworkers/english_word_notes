@@ -94,6 +94,12 @@ async function runExtractionJob(
 
       updateExtractionJob(jobId, { progress: 8, stage: "비전 모델 준비" });
       appendExtractionJobLog(jobId, "Ollama Vision 추출을 시작합니다.");
+      appendExtractionJobLog(
+        jobId,
+        `Ollama Vision 설정: baseUrl=${providerSettings.ollamaBaseUrl || "기본값"}, model=${
+          providerSettings.ollamaVisionModel || providerSettings.ollamaModel || "기본값"
+        }, timeout=${providerSettings.ollamaTimeoutMs || "기본값"}ms`
+      );
       const llm = await extractWithOllamaVision(files, providerSettings, {
         onProgress(progress, stage, message, details) {
           updateExtractionJob(jobId, {

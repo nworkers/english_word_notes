@@ -10,6 +10,7 @@ import type {
   VocabularyEntry,
   VocabularySense
 } from "./types";
+import { normalizeVocabularyNumbering, sanitizeSourceNumber } from "./vocabulary-numbering";
 
 const execFileAsync = promisify(execFile);
 
@@ -125,7 +126,9 @@ async function processOcrInputs(
       processedFiles: inputs.length,
       currentStep: 3
     });
-    const vocabulary = dedupeEntries(fileResults.flatMap((result) => result.entries));
+    const vocabulary = normalizeVocabularyNumbering(
+      dedupeEntries(fileResults.flatMap((result) => result.entries))
+    );
     const rawTexts = fileResults.map((result) => ({
       fileName: result.file.name,
       text: result.text.trim()
@@ -250,6 +253,7 @@ function parseVocabularyText(text: string) {
       warnings.push("뜻까지 함께 구분되지 않아 영어 단어만 우선 추출했습니다.");
       entries.push(
         ...fallbackWords.map((word) => ({
+          sourceNumber: undefined,
           word,
           senses: [{ partOfSpeech: "의미", meaning: "뜻 확인 필요" }]
         }))
@@ -273,6 +277,7 @@ function mergeParsedVocabulary(
     for (const entry of source) {
       const key = normalizeWord(entry.word);
       const candidate = {
+        sourceNumber: sanitizeSourceNumber(entry.sourceNumber) ?? undefined,
         word: key,
         senses: dedupeSenses(entry.senses)
       };
@@ -285,6 +290,12 @@ function mergeParsedVocabulary(
       const existing = mergedEntries.get(key)!;
       const winner = scoreEntry(candidate) > scoreEntry(existing) ? candidate : existing;
       winner.senses = chooseBetterSenses(existing.senses, candidate.senses);
+      if (
+        sanitizeSourceNumber(winner.sourceNumber) === null &&
+        sanitizeSourceNumber(entry.sourceNumber) !== null
+      ) {
+        winner.sourceNumber = sanitizeSourceNumber(entry.sourceNumber) ?? undefined;
+      }
       mergedEntries.set(key, winner);
     }
   }
@@ -404,9 +415,19 @@ function parseBlock(lines: string[]): VocabularyEntry | null {
   }
 
   return {
+    sourceNumber: extractSourceNumber(headLine) ?? undefined,
     word,
     senses
   };
+}
+
+function extractSourceNumber(line: string) {
+  const match = line.match(/^\s*(?:chapter\s*\d+\s*[-:.)]?\s*)?(\d{1,4})[\s.)-]+/i);
+  if (!match) {
+    return null;
+  }
+
+  return sanitizeSourceNumber(Number(match[1]));
 }
 
 function isHeadwordLikeLine(line: string) {
@@ -834,6 +855,7 @@ function dedupeEntries(entries: VocabularyEntry[]) {
 
     if (!existing) {
       grouped.set(normalizedWord, {
+        sourceNumber: sanitizeSourceNumber(entry.sourceNumber) ?? undefined,
         word: normalizedWord,
         senses: normalizedSenses
       });
@@ -841,6 +863,12 @@ function dedupeEntries(entries: VocabularyEntry[]) {
     }
 
     existing.senses = dedupeSenses([...existing.senses, ...normalizedSenses]);
+    if (
+      sanitizeSourceNumber(existing.sourceNumber) === null &&
+      sanitizeSourceNumber(entry.sourceNumber) !== null
+    ) {
+      existing.sourceNumber = sanitizeSourceNumber(entry.sourceNumber) ?? undefined;
+    }
   }
 
   return [...grouped.values()];
