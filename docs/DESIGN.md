@@ -56,19 +56,26 @@
 ## 5. 기술 선택 메모
 
 - 사용 언어:
-  미정. 웹 구현과 Vision API 연동이 쉬운 언어를 우선 고려
+  `TypeScript`
 - 프레임워크:
-  프론트엔드와 백엔드가 분리되거나 통합된 웹 프레임워크를 검토
+  `Next.js App Router`
 - 라이브러리 후보:
-  Vision API 연동 도구, 이미지 전처리 도구, `PDF` 생성 라이브러리, 스프레드시트 출력 로직
+  `pdf-lib`, `@pdf-lib/fontkit`, Vision API 연동 모듈, 수동 `XLS` XML 생성 로직
 - 테스트 도구:
   샘플 이미지 기반 추출 테스트, 업로드 플로우 테스트, `PDF` / `XLS` 레이아웃 검증 테스트
+- 배포 메모:
+  `ffmpeg`와 `Node.js` 런타임 의존성이 있어 Render에서는 Docker Web Service 배포를 기본 경로로 사용한다.
+- 배포 메모:
+  런타임에서 샘플 JSON과 폰트 파일을 읽으므로 컨테이너 이미지 안에 저장소 파일과 의존성을 함께 포함한다.
 
 ## 6. 디렉토리 구조
 
 ```text
 .
+├─ .dockerignore
+├─ Dockerfile
 ├─ README.md
+├─ render.yaml
 └─ docs/
    ├─ PROJECT_SPEC.md
    ├─ DESIGN.md

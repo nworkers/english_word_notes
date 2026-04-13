@@ -55,6 +55,29 @@ npm run dev
 
 현재 작업 환경에서는 `npm install`과 빌드 검증을 완료했습니다.
 
+## Render 배포
+
+- 이 프로젝트는 `PDF` 생성, 샘플 파일 조회, `ffmpeg` 기반 이미지 리사이즈를 위해 `Node.js` 런타임과 시스템 패키지가 필요합니다.
+- `Cloudflare Pages` 같은 정적 중심 호스팅보다 `Render`의 Docker Web Service 배포를 기본 경로로 권장합니다.
+- 저장소 루트에 아래 배포 파일이 포함되어 있습니다.
+  - `Dockerfile`
+  - `render.yaml`
+  - `.dockerignore`
+
+### Render에서 배포하는 방법
+
+1. Render에서 `New +` -> `Blueprint`를 선택합니다.
+2. 이 저장소를 연결하면 루트의 `render.yaml`을 읽어 `Docker` 웹 서비스를 생성합니다.
+3. 무료 플랜(`free`)으로 생성한 뒤 배포를 시작합니다.
+4. 배포 후 제공된 URL로 접속해 업로드, `PDF`, `XLS` 다운로드를 확인합니다.
+
+### Render 운영 메모
+
+- 무료 Web Service는 유휴 상태가 길면 sleep 상태로 전환될 수 있어 첫 요청이 느릴 수 있습니다.
+- 서버 디스크는 영구 저장소가 아니므로, 업로드 결과는 즉시 처리하고 브라우저 다운로드 중심으로 사용해야 합니다.
+- 현재 앱의 `Ollama` 로컬 서버 URL(`127.0.0.1` 등)은 Render 컨테이너 내부에서는 직접 접근되지 않습니다.
+  - Render 배포본에서는 `Gemini`, `OpenAI`, 또는 외부에서 접근 가능한 `Ollama Cloud` 구성을 권장합니다.
+
 ## 추출 메모
 
 - 현재 추출은 Vision 모델이 이미지에서 단어와 뜻을 직접 읽는 방식으로 동작합니다.
