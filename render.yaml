@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: english-memory-note-maker
+    name: english-word-notes
     runtime: docker
     plan: free
     autoDeploy: true
