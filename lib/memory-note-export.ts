@@ -8,6 +8,17 @@ import type { MemoryNoteExportPayload } from "@/lib/types";
 const A4_WIDTH = 595.28;
 const A4_HEIGHT = 841.89;
 const PAGE_MARGIN = 36;
+const PDF_NOTEBOOK_TITLE_SIZE = 9.5;
+const PDF_SECTION_TITLE_SIZE = 15;
+const PDF_SECTION_META_SIZE = 7.5;
+const PDF_TABLE_HEADER_SIZE = 15;
+const PDF_TABLE_BODY_SIZE = 15.6;
+const PDF_TABLE_NUMBER_SIZE = 15.4;
+const PDF_TABLE_FOOTER_SIZE = 7;
+const PDF_TABLE_HEADER_HEIGHT = 20;
+const PDF_TABLE_ROW_HEIGHT = 20.4;
+const PDF_TABLE_DIVIDER_GAP = 3;
+const PDF_MIN_FITTED_TEXT_SIZE = 4;
 const FONT_PATH = path.join(
   process.cwd(),
   "node_modules",
@@ -150,14 +161,14 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
       await drawTextLine(page, textRenderer, payload.notebookTitle, {
         x: PAGE_MARGIN,
         y: A4_HEIGHT - 36,
-        size: 9.5,
+        size: PDF_NOTEBOOK_TITLE_SIZE,
         color: rgb(0, 0, 0)
       });
 
       await drawTextLine(page, textRenderer, section.title, {
         x: PAGE_MARGIN,
         y: A4_HEIGHT - 54,
-        size: 15,
+        size: PDF_SECTION_TITLE_SIZE,
         color: rgb(0, 0, 0)
       });
 
@@ -168,21 +179,21 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
         {
           x: PAGE_MARGIN,
           y: A4_HEIGHT - 70,
-          size: 7.5,
+          size: PDF_SECTION_META_SIZE,
           color: rgb(0, 0, 0)
         }
       );
 
       const topY = A4_HEIGHT - 92;
-      const headerHeight = 17;
-      const rowHeight = 20.4;
+      const headerHeight = PDF_TABLE_HEADER_HEIGHT;
+      const rowHeight = PDF_TABLE_ROW_HEIGHT;
       const numberColumnWidth = 30;
       const promptWidth = 268;
       const answerWidth = A4_WIDTH - PAGE_MARGIN * 2 - promptWidth;
       const promptX = PAGE_MARGIN;
       const answerX = promptX + promptWidth;
       const tableTopY = topY;
-      const dividerGap = 3;
+      const dividerGap = PDF_TABLE_DIVIDER_GAP;
       const tableHeight =
         headerHeight +
         dividerGap +
@@ -221,29 +232,29 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
 
       await drawTextLine(page, textRenderer, "번호", {
         x: promptX + 5,
-        y: tableTopY - headerHeight + 5.3,
-        size: 7.5,
+        y: tableTopY - headerHeight + 3,
+        size: PDF_TABLE_HEADER_SIZE,
         color: rgb(0, 0, 0)
       });
 
       await drawTextLine(page, textRenderer, "문항", {
         x: promptX + numberColumnWidth + 5,
-        y: tableTopY - headerHeight + 5.3,
-        size: 7.5,
+        y: tableTopY - headerHeight + 3,
+        size: PDF_TABLE_HEADER_SIZE,
         color: rgb(0, 0, 0)
       });
 
       await drawTextLine(page, textRenderer, "답안", {
         x: answerX + 6,
-        y: tableTopY - headerHeight + 5.3,
-        size: 7.5,
+        y: tableTopY - headerHeight + 3,
+        size: PDF_TABLE_HEADER_SIZE,
         color: rgb(0, 0, 0)
       });
 
       for (const [rowIndex, row] of pageRows.entries()) {
         const rowTopY = topY - headerHeight - dividerGap - rowIndex * (rowHeight + dividerGap);
         const rowBottomY = rowTopY - rowHeight;
-        const textY = rowBottomY + 7;
+        const textY = rowBottomY + 2.7;
 
         if (rowIndex > 0) {
           page.drawLine({
@@ -257,7 +268,7 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
         await drawTextLine(page, textRenderer, `${row.sourceNumber}.`, {
           x: promptX + 4,
           y: textY,
-          size: 7.7,
+          size: PDF_TABLE_NUMBER_SIZE,
           maxWidth: numberColumnWidth - 6,
           color: rgb(0, 0, 0)
         });
@@ -265,7 +276,7 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
         await drawTextLine(page, textRenderer, row.prompt, {
           x: promptX + numberColumnWidth + 5,
           y: textY,
-          size: 7.8,
+          size: PDF_TABLE_BODY_SIZE,
           maxWidth: promptWidth - numberColumnWidth - 7,
           color: rgb(0, 0, 0)
         });
@@ -278,7 +289,7 @@ export async function buildPdfBuffer(payload: MemoryNoteExportPayload) {
         {
           x: PAGE_MARGIN,
           y: 14,
-          size: 7,
+          size: PDF_TABLE_FOOTER_SIZE,
           color: rgb(0, 0, 0)
         }
       );
@@ -348,45 +359,44 @@ async function drawTextLine(
     maxWidth?: number;
   }
 ) {
-  const fittedText =
+  const layout =
     options.maxWidth === undefined
-      ? text
-      : await fitTextToWidth(renderer, text, options.size, options.maxWidth);
-  const runs = await buildTextRuns(renderer, fittedText);
+      ? { text, size: options.size }
+      : await fitTextLayout(renderer, text, options.size, options.maxWidth);
+  const runs = await buildTextRuns(renderer, layout.text);
   let offsetX = options.x;
 
   for (const run of runs) {
     page.drawText(run.text, {
       x: offsetX,
       y: options.y,
-      size: options.size,
+      size: layout.size,
       font: run.font,
       color: options.color
     });
-    offsetX += run.font.widthOfTextAtSize(run.text, options.size);
+    offsetX += run.font.widthOfTextAtSize(run.text, layout.size);
   }
 }
 
-async function fitTextToWidth(
+async function fitTextLayout(
   renderer: TextRenderer,
   text: string,
   size: number,
   maxWidth: number
 ) {
   if ((await measureTextWidth(renderer, text, size)) <= maxWidth) {
-    return text;
+    return { text, size };
   }
 
-  const chars = Array.from(text);
-  while (chars.length > 1) {
-    chars.pop();
-    const candidate = `${chars.join("")}...`;
-    if ((await measureTextWidth(renderer, candidate, size)) <= maxWidth) {
-      return candidate;
+  let nextSize = size;
+  while (nextSize > PDF_MIN_FITTED_TEXT_SIZE) {
+    nextSize = Math.max(PDF_MIN_FITTED_TEXT_SIZE, Number((nextSize - 0.2).toFixed(1)));
+    if ((await measureTextWidth(renderer, text, nextSize)) <= maxWidth) {
+      return { text, size: nextSize };
     }
   }
 
-  return "...";
+  return { text, size: PDF_MIN_FITTED_TEXT_SIZE };
 }
 
 async function measureTextWidth(renderer: TextRenderer, text: string, size: number) {
@@ -476,14 +486,14 @@ async function appendAnswerKeyPages(
     await drawTextLine(page, textRenderer, payload.notebookTitle, {
       x: PAGE_MARGIN,
       y: A4_HEIGHT - 36,
-      size: 9.5,
+      size: PDF_NOTEBOOK_TITLE_SIZE,
       color: rgb(0, 0, 0)
     });
 
     await drawTextLine(page, textRenderer, "정답지", {
       x: PAGE_MARGIN,
       y: A4_HEIGHT - 54,
-      size: 15,
+      size: PDF_SECTION_TITLE_SIZE,
       color: rgb(0, 0, 0)
     });
 
@@ -494,15 +504,15 @@ async function appendAnswerKeyPages(
       {
         x: PAGE_MARGIN,
         y: A4_HEIGHT - 70,
-        size: 7.5,
+        size: PDF_SECTION_META_SIZE,
         color: rgb(0, 0, 0)
       }
     );
 
     const topY = A4_HEIGHT - 92;
-    const headerHeight = 17;
-    const rowHeight = 20.4;
-    const dividerGap = 3;
+    const headerHeight = PDF_TABLE_HEADER_HEIGHT;
+    const rowHeight = PDF_TABLE_ROW_HEIGHT;
+    const dividerGap = PDF_TABLE_DIVIDER_GAP;
     const numberWidth = 44;
     const wordWidth = 156;
     const meaningWidth = A4_WIDTH - PAGE_MARGIN * 2 - numberWidth - wordWidth;
@@ -547,27 +557,27 @@ async function appendAnswerKeyPages(
 
     await drawTextLine(page, textRenderer, "번호", {
       x: numberX + 8,
-      y: tableTopY - headerHeight + 5.3,
-      size: 7.5,
+      y: tableTopY - headerHeight + 3,
+      size: PDF_TABLE_HEADER_SIZE,
       color: rgb(0, 0, 0)
     });
     await drawTextLine(page, textRenderer, "단어", {
       x: wordX + 8,
-      y: tableTopY - headerHeight + 5.3,
-      size: 7.5,
+      y: tableTopY - headerHeight + 3,
+      size: PDF_TABLE_HEADER_SIZE,
       color: rgb(0, 0, 0)
     });
     await drawTextLine(page, textRenderer, "뜻", {
       x: meaningX + 8,
-      y: tableTopY - headerHeight + 5.3,
-      size: 7.5,
+      y: tableTopY - headerHeight + 3,
+      size: PDF_TABLE_HEADER_SIZE,
       color: rgb(0, 0, 0)
     });
 
     for (const [rowIndex, entry] of pageEntries.entries()) {
       const rowTopY = topY - headerHeight - dividerGap - rowIndex * (rowHeight + dividerGap);
       const rowBottomY = rowTopY - rowHeight;
-      const textY = rowBottomY + 7;
+      const textY = rowBottomY + 2.7;
 
       if (rowIndex > 0) {
         page.drawLine({
@@ -581,14 +591,14 @@ async function appendAnswerKeyPages(
       await drawTextLine(page, textRenderer, String(entry.sourceNumber ?? pageIndex * MEMORY_NOTE_ROWS_PER_PAGE + rowIndex + 1), {
         x: numberX + 8,
         y: textY,
-        size: 7.2,
+        size: PDF_TABLE_BODY_SIZE,
         maxWidth: numberWidth - 14,
         color: rgb(0, 0, 0)
       });
       await drawTextLine(page, textRenderer, entry.word, {
         x: wordX + 8,
         y: textY,
-        size: 7.2,
+        size: PDF_TABLE_BODY_SIZE,
         maxWidth: wordWidth - 14,
         color: rgb(0, 0, 0)
       });
@@ -599,7 +609,7 @@ async function appendAnswerKeyPages(
         {
           x: meaningX + 8,
           y: textY,
-          size: 7.2,
+          size: PDF_TABLE_BODY_SIZE,
           maxWidth: meaningWidth - 14,
           color: rgb(0, 0, 0)
         }
