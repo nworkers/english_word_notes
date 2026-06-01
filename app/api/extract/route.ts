@@ -149,6 +149,9 @@ async function runExtractionJob(
           if (message) {
             appendExtractionJobLog(jobId, message);
           }
+        },
+        onLog(message) {
+          appendExtractionJobLog(jobId, message);
         }
       });
 

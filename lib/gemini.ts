@@ -23,11 +23,12 @@ type GeminiProgressCallbacks = {
     message?: string,
     details?: { currentStep?: number; processedFiles?: number }
   ) => void;
+  onLog?: (message: string) => void;
 };
 
 const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
-const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
-const DEFAULT_GEMINI_VISION_MODEL = "gemini-2.5-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash";
+const DEFAULT_GEMINI_VISION_MODEL = "gemini-3.5-flash";
 const DEFAULT_GEMINI_TIMEOUT_MS = 120_000;
 
 export function isGeminiEnabled(settings?: Partial<ProviderSettings>) {
@@ -50,6 +51,10 @@ export async function postProcessWithGemini(
   const ocrText = (extraction.rawTexts ?? []).map((item) => item.text).join("\n");
   const resolved = resolveGeminiSettings(settings);
   const url = buildGeminiUrl(resolved.baseUrl, resolved.model, resolved.apiKey);
+  const safeUrl = redactGeminiUrl(url);
+  callbacks?.onLog?.(
+    `Gemini API 호출 URL: ${safeUrl} (model=${resolved.model}, timeout=${resolved.timeoutMs}ms)`
+  );
 
   const response = await fetchWithTimeout(
     url,
@@ -77,7 +82,7 @@ export async function postProcessWithGemini(
   );
 
   if (!response.ok) {
-    throw new Error(`Gemini API 호출 실패: ${response.status} ${response.statusText}`);
+    throw new Error(await buildGeminiHttpError("Gemini API", response, safeUrl));
   }
 
   const payload = (await response.json()) as GeminiGenerateResponse;
@@ -121,6 +126,7 @@ export async function extractWithGeminiVision(
 
   const resolved = resolveGeminiSettings(settings);
   const url = buildGeminiUrl(resolved.baseUrl, resolved.visionModel, resolved.apiKey);
+  const safeUrl = redactGeminiUrl(url);
   const encodedImages = await Promise.all(
     files.map(async (file, index) => {
       const encoded = await encodeFileToInlineData(file);
@@ -141,6 +147,15 @@ export async function extractWithGeminiVision(
     currentStep: 3,
     processedFiles: files.length
   });
+  callbacks?.onLog?.(
+    [
+      `Gemini Vision 호출 URL: ${safeUrl}`,
+      `model=${resolved.visionModel}`,
+      `timeout=${resolved.timeoutMs}ms`,
+      `files=${files.length}`,
+      `totalBytes=${files.reduce((sum, file) => sum + file.size, 0)}`
+    ].join(" / ")
+  );
 
   const response = await fetchWithTimeout(
     url,
@@ -167,7 +182,7 @@ export async function extractWithGeminiVision(
   );
 
   if (!response.ok) {
-    throw new Error(`Gemini Vision API 호출 실패: ${response.status} ${response.statusText}`);
+    throw new Error(await buildGeminiHttpError("Gemini Vision API", response, safeUrl));
   }
 
   const payload = (await response.json()) as GeminiGenerateResponse;
@@ -227,6 +242,64 @@ function buildGeminiUrl(baseUrl: string, model: string, apiKey: string) {
   return `${normalized}/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
 }
 
+function redactGeminiUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    const key = parsed.searchParams.get("key");
+    if (key) {
+      parsed.searchParams.set("key", redactSecret(key));
+    }
+    return parsed.toString();
+  } catch {
+    return url.replace(/([?&]key=)[^&]+/i, `$1${redactSecret("")}`);
+  }
+}
+
+function redactSecret(secret: string) {
+  if (secret.length <= 8) {
+    return "****";
+  }
+
+  return `${secret.slice(0, 4)}...${secret.slice(-4)}`;
+}
+
+async function buildGeminiHttpError(label: string, response: Response, safeUrl: string) {
+  const body = truncateForLog(await readResponseText(response), 1200);
+  const details = [
+    `${label} 호출 실패: ${response.status} ${response.statusText}`,
+    `url=${safeUrl}`
+  ];
+
+  if (body) {
+    details.push(`response=${body}`);
+  }
+
+  if (response.status === 503) {
+    details.push(
+      "possibleCause=Gemini 서비스가 일시적으로 과부하 상태이거나 다운되었을 수 있습니다. 이미지 수/용량이 큰 요청이면 요청 크기도 함께 확인하세요."
+    );
+  }
+
+  return details.join(" / ");
+}
+
+async function readResponseText(response: Response) {
+  try {
+    return await response.text();
+  } catch {
+    return "";
+  }
+}
+
+function truncateForLog(value: string, maxLength: number) {
+  const compact = value.replace(/\s+/g, " ").trim();
+  if (compact.length <= maxLength) {
+    return compact;
+  }
+
+  return `${compact.slice(0, maxLength)}...`;
+}
+
 async function fetchWithTimeout(
   input: string,
   init: RequestInit & { timeoutMs: number }
@@ -240,6 +313,19 @@ async function fetchWithTimeout(
       signal: controller.signal
     });
     return response;
+  } catch (error) {
+    const safeUrl = redactGeminiUrl(input);
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error(
+        `Gemini 요청이 중단되었습니다. timeout=${init.timeoutMs}ms 안에 응답이 오지 않았거나 연결이 끊어졌습니다. url=${safeUrl}`
+      );
+    }
+
+    if (error instanceof TypeError) {
+      throw new Error(`Gemini 서버 연결 실패: ${error.message} / url=${safeUrl}`);
+    }
+
+    throw error;
   } finally {
     clearTimeout(timeout);
   }

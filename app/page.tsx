@@ -21,6 +21,8 @@ import type {
 const acceptedTypes = "image/png,image/jpeg";
 const idleLogs = ["[준비됨] 이미지를 선택하고 단어장 생성을 누르면 처리 로그가 여기에 표시됩니다."];
 const providerSettingsStorageKey = "english-word-notes.provider-settings";
+const extractionModeStorageKey = "english-word-notes.extraction-mode";
+type ExtractionMode = "ollama-vision" | "gemini-vision" | "openai-vision";
 const defaultProviderSettings: ProviderSettings = {
   ollamaBaseUrl: "https://ollama.com/api",
   ollamaApiKey: "",
@@ -30,8 +32,8 @@ const defaultProviderSettings: ProviderSettings = {
   ollamaVisionMaxWidth: 1024,
   ollamaVisionQuality: 4,
   geminiApiKey: "",
-  geminiModel: "gemini-2.5-flash",
-  geminiVisionModel: "gemini-2.5-flash",
+  geminiModel: "gemini-3.5-flash",
+  geminiVisionModel: "gemini-3.5-flash",
   geminiBaseUrl: "https://generativelanguage.googleapis.com/v1beta",
   geminiTimeoutMs: 120000,
   openaiApiKey: "",
@@ -59,11 +61,7 @@ export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [result, setResult] = useState<ExtractionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [mode, setMode] = useState<
-    | "ollama-vision"
-    | "gemini-vision"
-    | "openai-vision"
-  >("ollama-vision");
+  const [mode, setMode] = useState<ExtractionMode>("ollama-vision");
   const [isPending, startTransition] = useTransition();
   const [wordRows, setWordRows] = useState<MemoryNoteRow[]>([]);
   const [meaningRows, setMeaningRows] = useState<MemoryNoteRow[]>([]);
@@ -113,29 +111,44 @@ export default function HomePage() {
   }
 
   useEffect(() => {
+    const stored = window.localStorage.getItem(providerSettingsStorageKey);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as Partial<ProviderSettings>;
+        setProviderSettings({
+          ...defaultProviderSettings,
+          ...parsed
+        });
+      } catch {
+        window.localStorage.removeItem(providerSettingsStorageKey);
+      }
+    }
+
+    const storedMode = window.localStorage.getItem(extractionModeStorageKey);
+    if (isExtractionMode(storedMode)) {
+      setMode(storedMode);
+    } else if (storedMode) {
+      window.localStorage.removeItem(extractionModeStorageKey);
+    }
+
     setHasHydrated(true);
   }, []);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(providerSettingsStorageKey);
-    if (!stored) {
+    if (!hasHydrated) {
       return;
     }
 
-    try {
-      const parsed = JSON.parse(stored) as Partial<ProviderSettings>;
-      setProviderSettings({
-        ...defaultProviderSettings,
-        ...parsed
-      });
-    } catch {
-      window.localStorage.removeItem(providerSettingsStorageKey);
-    }
-  }, []);
+    window.localStorage.setItem(providerSettingsStorageKey, JSON.stringify(providerSettings));
+  }, [hasHydrated, providerSettings]);
 
   useEffect(() => {
-    window.localStorage.setItem(providerSettingsStorageKey, JSON.stringify(providerSettings));
-  }, [providerSettings]);
+    if (!hasHydrated) {
+      return;
+    }
+
+    window.localStorage.setItem(extractionModeStorageKey, mode);
+  }, [hasHydrated, mode]);
 
   useEffect(() => {
     if (!isSettingsOpen) {
@@ -1423,6 +1436,10 @@ function normalizeVocabularyEntries(value: unknown): ExtractionResponse["vocabul
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+function isExtractionMode(value: unknown): value is ExtractionMode {
+  return value === "ollama-vision" || value === "gemini-vision" || value === "openai-vision";
 }
 
 function isSavedExtractionSnapshot(value: unknown): value is SavedExtractionSnapshot {
